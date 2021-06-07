@@ -6,7 +6,6 @@ import '../bootstrap.min.css';
 
 import Header from './common/Header';
 import Footer from './common/Footer';
-// import AboutUs from './';
 import Login from "./common/login";
 import Register from "./common/register";
 import Home from "./common/Home";
