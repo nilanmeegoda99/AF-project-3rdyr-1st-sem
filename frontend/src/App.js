@@ -39,7 +39,7 @@ class App extends Component{
                     </main>
 
                 {
-                    location.pathname != "/404" && <Footer />
+                    location.pathname != "/register" && location.pathname != "/login" && <Footer />
                 }
 
             </Router>

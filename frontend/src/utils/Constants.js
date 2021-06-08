@@ -2,16 +2,13 @@
 export const userTypes = [
     {
         key: 1,
-        value: 'attendee',
-        label: 'Attendee'
+        value: 'Attendee'
 
     },{
         key: 2,
-        value: 'researcher',
-        label: 'Researcher',
+        value: 'Researcher',
     },{
         key: 3,
-        value: 'workshop_coordinator',
-        label: 'Workshop Coordinator',
+        value: 'Workshop Coordinator',
     },
 ];

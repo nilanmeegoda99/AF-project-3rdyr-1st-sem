@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
+import Loader from '../common/Loader'
 class Home extends Component {
     render() {
         return (
             <div>
                 <h1>Home Page</h1>
-
                 <p>
                     What is Lorem Ipsum?
                     Lorem Ipsum is simply dummy text of the printing and typesetting industry
