@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 
-class Login extends Component {
+class NotFound404 extends Component {
     render() {
         return (
             <div>
-                Login
+                NotFound404
             </div>
         );
     }
 }
 
-export default Login;
+export default NotFound404;

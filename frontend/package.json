@@ -1,21 +1,26 @@
 {
   "name": "frontend",
   "version": "1.0.0",
-  "description": "Application Framework Project Backend",
-  "main": "src/index.js",
+  "description": "Application Framework Project Frontend",
+  "main": "index.js",
   "scripts": {
-    "start": "parcel src/index.html"
+    "start": "parcel ./src/index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "2021S1_REG_WE_38",
   "license": "ISC",
   "devDependencies": {
+    "@parcel/transformer-image": "^2.0.0-nightly.2335",
     "parcel": "^2.0.0-beta.3.1"
   },
   "dependencies": {
-    "bootstrap": "^4.6.0",
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.58",
+    "axios": "^0.21.1",
     "react": "^17.0.2",
-    "react-bootstrap": "^1.6.0",
     "react-dom": "^17.0.2",
+    "react-material-ui-form-validator": "^2.1.4",
     "react-router-dom": "^5.2.0"
   }
 }

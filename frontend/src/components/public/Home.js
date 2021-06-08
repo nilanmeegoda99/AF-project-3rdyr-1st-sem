@@ -1,12 +1,10 @@
 import React, {Component} from 'react';
-import { Button } from "react-bootstrap";
-
+import Loader from '../common/Loader'
 class Home extends Component {
     render() {
         return (
             <div>
                 <h1>Home Page</h1>
-                <Button>Sample</Button>
                 <p>
                     What is Lorem Ipsum?
                     Lorem Ipsum is simply dummy text of the printing and typesetting industry
@@ -127,6 +125,7 @@ class Home extends Component {
                     therefore always holds in these matters to this principle of selection: he rejects pleasu
                     res to secure other greater pleasures, or else he endures pains to avoid worse pains."
                 </p>
+
             </div>
         );
     }
