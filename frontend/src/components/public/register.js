@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
-import { Container, Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { userTypes } from '../../utils/Constants';
 import Loader from '../common/Loader';
-// import Select from 'react-select';
+import axios from 'axios';
 
 const initialState = {
     formData: {
@@ -72,7 +71,7 @@ class Register extends Component {
             this.setState({
                 message: messageRes,
                 variant: variantRes,
-                loading: false,  
+                loading: false,
             })
         }, 2000);
 
@@ -106,95 +105,96 @@ class Register extends Component {
 
     render() {
         return (
-            <div>
-                <Container className='py-3'>
-                    
-                <h1 className="text-center mt-3">User Registration</h1>
+            <div></div>
+            // <div>
+            //     <Container className='py-3'>
 
-                {/* Loading */}
-                {
-                    this.state.loading && <Loader />
-                }
+            //     <h1 className="text-center mt-3">User Registration</h1>
 
-                <Row className="justify-content-md-center mt-3">
-                    <Col xs={12} md={6}>
+            //     {/* Loading */}
+            //     {
+            //         this.state.loading && <Loader />
+            //     }
 
-                        <Form onSubmit={this.fromSubmit}>
-                            
-                            <Form.Group className="mb-3">
-                                <Form.Label>Name</Form.Label>
-                                    <Form.Control 
-                                        type="text" 
-                                        placeholder="Enter Name"
-                                        name="name"
-                                        value={this.state.formData.name}
-                                        onChange={(e) => this.handleChange(e)} 
-                                        required/>
+            //     <Row className="justify-content-md-center mt-3">
+            //         <Col xs={12} md={6}>
 
-                                    <Form.Text className="text-muted">
-                                </Form.Text>
-                            </Form.Group>
+            //             <Form onSubmit={this.fromSubmit}>
 
-                            <Form.Group className="mb-3">
-                                <Form.Label>Email Address</Form.Label>
-                                    <Form.Control 
-                                        type="email" 
-                                        placeholder="Enter Email"
-                                        name="email"
-                                        value={this.state.formData.email}
-                                        onChange={(e) => this.handleChange(e)} 
-                                        required/>
+            //                 <Form.Group className="mb-3">
+            //                     <Form.Label>Name</Form.Label>
+            //                         <Form.Control
+            //                             type="text"
+            //                             placeholder="Enter Name"
+            //                             name="name"
+            //                             value={this.state.formData.name}
+            //                             onChange={(e) => this.handleChange(e)}
+            //                             required/>
 
-                                    <Form.Text className="text-muted">
-                                </Form.Text>
-                            </Form.Group>
+            //                         <Form.Text className="text-muted">
+            //                     </Form.Text>
+            //                 </Form.Group>
 
-                            <Form.Group className="mb-3">
-                                <Form.Label>Contact Number</Form.Label>
-                                    <Form.Control 
-                                        type="text" 
-                                        placeholder="Enter Contact Number"
-                                        name="contact_no"
-                                        value={this.state.formData.contact_no}
-                                        onChange={(e) => this.handleChange(e)} 
-                                        required/>
+            //                 <Form.Group className="mb-3">
+            //                     <Form.Label>Email Address</Form.Label>
+            //                         <Form.Control
+            //                             type="email"
+            //                             placeholder="Enter Email"
+            //                             name="email"
+            //                             value={this.state.formData.email}
+            //                             onChange={(e) => this.handleChange(e)}
+            //                             required/>
 
-                                    <Form.Text className="text-muted">
-                                </Form.Text>
-                            </Form.Group>
-                            
-                            <Form.Group className="mb-3" controlId="formBasicPassword">
-                                <Form.Label>Password</Form.Label>
-                                <Form.Control 
-                                    type="password" 
-                                    placeholder="Password"
-                                    name="password"
-                                    value={this.state.formData.password}
-                                    onChange={(e) => this.handleChange(e)}  
-                                    required />
-                            </Form.Group>
+            //                         <Form.Text className="text-muted">
+            //                     </Form.Text>
+            //                 </Form.Group>
 
-                            <a href="/login">Already have an Account ?</a>
+            //                 <Form.Group className="mb-3">
+            //                     <Form.Label>Contact Number</Form.Label>
+            //                         <Form.Control
+            //                             type="text"
+            //                             placeholder="Enter Contact Number"
+            //                             name="contact_no"
+            //                             value={this.state.formData.contact_no}
+            //                             onChange={(e) => this.handleChange(e)}
+            //                             required/>
 
-                            {
-                                this.state.message != '' &&
-                                <Alert variant={this.state.variant}>
-                                    {this.state.message}
-                                </Alert>
-                            }
-                        
-                            <div className="text-center">
-                                <Button variant="primary" type="submit">
-                                    REGISTER
-                                </Button>
-                            </div>
+            //                         <Form.Text className="text-muted">
+            //                     </Form.Text>
+            //                 </Form.Group>
 
-                        </Form>
-                    </Col>
-                </Row>
+            //                 <Form.Group className="mb-3" controlId="formBasicPassword">
+            //                     <Form.Label>Password</Form.Label>
+            //                     <Form.Control
+            //                         type="password"
+            //                         placeholder="Password"
+            //                         name="password"
+            //                         value={this.state.formData.password}
+            //                         onChange={(e) => this.handleChange(e)}
+            //                         required />
+            //                 </Form.Group>
 
-                </Container>
-            </div>
+            //                 <a href="/login">Already have an Account ?</a>
+
+            //                 {
+            //                     this.state.message != '' &&
+            //                     <Alert variant={this.state.variant}>
+            //                         {this.state.message}
+            //                     </Alert>
+            //                 }
+
+            //                 <div className="text-center">
+            //                     <Button variant="primary" type="submit">
+            //                         REGISTER
+            //                     </Button>
+            //                 </div>
+
+            //             </Form>
+            //         </Col>
+            //     </Row>
+
+            //     </Container>
+            // </div>
         );
     }
 }

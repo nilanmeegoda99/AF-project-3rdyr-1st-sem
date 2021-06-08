@@ -1,9 +1,7 @@
 import React, { Component, Fragment } from "react";
 import { BrowserRouter as Router, Redirect, Route, Switch } from "react-router-dom";
-import NotFound404 from './components/sessions/NotFound404';
 
-import './bootstrap.min.css';
-import './index.css';
+import './static/index.css';
 
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
@@ -27,7 +25,7 @@ class App extends Component{
                 {
                     location.pathname != "/404" && <Header />
                 }
-                    <main style={{ marginTop: '55px' }}>
+                    <main style={{ marginTop: '60px' }}>
                         <Switch>
                             <Route exact path="/" component={Home} />
                             <Route path="/about" component={AboutUs} />
@@ -36,6 +34,7 @@ class App extends Component{
                             <Route path="/register" component={Register} />
 
                             <Route component={NotFound404} />
+
                         </Switch>
                     </main>
 

@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import { Container, Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import Loader from '../common/Loader';
 
@@ -87,65 +86,66 @@ class Login extends Component {
 
     render() {
         return (
-            <div>
-                <Container className='py-3'>
+            <div></div>
+            // <div>
+            //     <Container className='py-3'>
                     
-                <h1 className="text-center mt-3">User Login</h1>
+            //     <h1 className="text-center mt-3">User Login</h1>
 
-                {/* Loading */}
-                {
-                    this.state.loading && <Loader />
-                }
+            //     {/* Loading */}
+            //     {
+            //         this.state.loading && <Loader />
+            //     }
 
-                <Row className="justify-content-md-center mt-3">
-                    <Col xs={12} md={6}>
-                        <Form onSubmit={this.fromSubmit}>
-                            <Form.Group className="mb-3" controlId="formBasicEmail">
-                                <Form.Label>Email Address</Form.Label>
-                                    <Form.Control 
-                                        type="email" 
-                                        placeholder="Enter Email"
-                                        name="email"
-                                        value={this.state.formData.email}
-                                        onChange={(e) => this.handleChange(e)} 
-                                        required/>
+            //     <Row className="justify-content-md-center mt-3">
+            //         <Col xs={12} md={6}>
+            //             <Form onSubmit={this.fromSubmit}>
+            //                 <Form.Group className="mb-3" controlId="formBasicEmail">
+            //                     <Form.Label>Email Address</Form.Label>
+            //                         <Form.Control 
+            //                             type="email" 
+            //                             placeholder="Enter Email"
+            //                             name="email"
+            //                             value={this.state.formData.email}
+            //                             onChange={(e) => this.handleChange(e)} 
+            //                             required/>
 
-                                    <Form.Text className="text-muted">
-                                </Form.Text>
-                            </Form.Group>
+            //                         <Form.Text className="text-muted">
+            //                     </Form.Text>
+            //                 </Form.Group>
 
-                            <Form.Group className="mb-3" controlId="formBasicPassword">
-                                <Form.Label>Password</Form.Label>
-                                <Form.Control 
-                                    type="password" 
-                                    placeholder="Password"
-                                    name="password"
-                                    value={this.state.formData.password}
-                                    onChange={(e) => this.handleChange(e)}  
-                                    required />
-                            </Form.Group>
+            //                 <Form.Group className="mb-3" controlId="formBasicPassword">
+            //                     <Form.Label>Password</Form.Label>
+            //                     <Form.Control 
+            //                         type="password" 
+            //                         placeholder="Password"
+            //                         name="password"
+            //                         value={this.state.formData.password}
+            //                         onChange={(e) => this.handleChange(e)}  
+            //                         required />
+            //                 </Form.Group>
 
-                            <a href="/register">Create New Account ?</a>
+            //                 <a href="/register">Create New Account ?</a>
 
-                            {
-                                this.state.message != '' &&
-                                <Alert variant={this.state.variant}>
-                                    {this.state.message}
-                                </Alert>
-                            }
+            //                 {
+            //                     this.state.message != '' &&
+            //                     <Alert variant={this.state.variant}>
+            //                         {this.state.message}
+            //                     </Alert>
+            //                 }
                         
-                            <div className="text-center">
-                                <Button variant="primary" type="submit">
-                                    LOGIN
-                                </Button>
-                            </div>
+            //                 <div className="text-center">
+            //                     <Button variant="primary" type="submit">
+            //                         LOGIN
+            //                     </Button>
+            //                 </div>
 
-                        </Form>
-                    </Col>
-                </Row>
+            //             </Form>
+            //         </Col>
+            //     </Row>
 
-                </Container>
-            </div>
+            //     </Container>
+            // </div>
         );
     }
 }
