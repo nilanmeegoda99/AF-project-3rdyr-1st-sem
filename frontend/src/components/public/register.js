@@ -14,6 +14,13 @@ const styles = theme =>({
         paddingRight: 10,
         minWidth: '360px',
     },
+    linkText:{
+        textDecoration: 'none',
+        '&:hover':{
+            textDecoration: 'underline',
+            color: '#DDC545'
+        },
+    },
 
 });
 
@@ -241,7 +248,7 @@ class Register extends Component {
 
                             <Grid item xs={12} md={12} className={classes.inputElement}>
                                 <div className="float-end mb-4">
-                                    <a href="/login">Already have an Account ?</a>
+                                    <a href="/login" className={classes.linkText}>Already have an Account ?</a>
                                 </div>
                             </Grid>
 
@@ -260,7 +267,7 @@ class Register extends Component {
                             <Grid item xs={12} md={12}>
                                 <div className="text-center my-3">
                                     <Button variant="contained" color="primary" type="submit">
-                                        LOGIN
+                                        REGISTER
                                     </Button>
                                 </div>
                             </Grid>

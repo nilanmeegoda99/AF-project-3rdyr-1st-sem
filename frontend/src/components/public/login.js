@@ -14,6 +14,13 @@ const styles = theme =>({
         paddingRight: 10,
         minWidth: '360px',
     },
+    linkText:{
+        textDecoration: 'none',
+        '&:hover':{
+            textDecoration: 'underline',
+            color: '#DDC545'
+        },
+    },
 
 });
 
@@ -158,7 +165,7 @@ class Login extends Component {
 
                             <Grid item xs={12} md={12} className={classes.inputElement}>
                                 <div className="float-end mb-4">
-                                    <a href="/register">Create New Account ?</a>
+                                    <a href="/register" className={classes.linkText}>Create New Account ?</a>
                                 </div>
                             </Grid>
 
