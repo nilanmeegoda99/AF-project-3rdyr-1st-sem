@@ -1,14 +1,19 @@
 import React, { Component, Fragment } from "react";
-import {  Container } from 'react-bootstrap';
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import '../bootstrap.min.css';
-// import '../index.css';
+import { BrowserRouter as Router, Redirect, Route, Switch } from "react-router-dom";
+import NotFound404 from './components/sessions/NotFound404';
 
-import Header from './common/Header';
-import Footer from './common/Footer';
-import Login from "./common/login";
-import Register from "./common/register";
-import Home from "./common/Home";
+import './bootstrap.min.css';
+import './index.css';
+
+import Header from './components/common/Header';
+import Footer from './components/common/Footer';
+import Login from './components/public/Login';
+import Register from './components/public/Register';
+import Home from './components/public/Home';
+import AboutUs from './components/public/AboutUs';
+import Keynotes from './components/public/Keynotes';
+
+import NotFound404 from './components/sessions/NotFound404';
 
 class App extends Component{
 
@@ -19,18 +24,27 @@ class App extends Component{
     render() {
         return(
             <Router>
-                <Header />
+
+                {
+                    location.pathname != "/404" && <Header />
+                }
                     <main style={{ marginTop: '55px' }}>
-                        <Container>
+                        <Switch>
                             <Route exact path="/" component={Home} />
-                            {/*<Route path="/Aboutus" component={AboutUs} />*/}
+                            <Route path="/about" component={AboutUs} />
+                            <Route path="/keynotes" component={Keynotes} />
 
                             <Route path="/login" component={Login} />
                             <Route path="/register" component={Register} />
 
-                        </Container>
+                            <Route component={NotFound404} />
+                        </Switch>
                     </main>
-                <Footer />
+
+                {
+                    location.pathname != "/404" && <Footer />
+                }
+
             </Router>
         )
     }
