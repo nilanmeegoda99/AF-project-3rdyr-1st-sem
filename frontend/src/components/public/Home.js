@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Button } from "react-bootstrap";
+import {Button, Col, Row} from "react-bootstrap";
 
 class Home extends Component {
     render() {
@@ -127,6 +127,13 @@ class Home extends Component {
                     therefore always holds in these matters to this principle of selection: he rejects pleasu
                     res to secure other greater pleasures, or else he endures pains to avoid worse pains."
                 </p>
+
+                <Row>
+                    <Col className='text-center py-3' style={{ backgroundColor:'red', color: '#ffffff80' }}>
+                        Copyright @ 2021S1_REG_WE_38
+                    </Col>
+                </Row>
+
             </div>
         );
     }
