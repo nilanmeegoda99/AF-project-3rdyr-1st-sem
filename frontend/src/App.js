@@ -11,7 +11,6 @@ import Login from './components/public/Login';
 import Register from './components/public/Register';
 import Home from './components/public/Home';
 import AboutUs from './components/public/AboutUs';
-import Keynotes from './components/public/Keynotes';
 
 import NotFound404 from './components/sessions/NotFound404';
 
@@ -32,7 +31,6 @@ class App extends Component{
                         <Switch>
                             <Route exact path="/" component={Home} />
                             <Route path="/about" component={AboutUs} />
-                            <Route path="/keynotes" component={Keynotes} />
 
                             <Route path="/login" component={Login} />
                             <Route path="/register" component={Register} />
