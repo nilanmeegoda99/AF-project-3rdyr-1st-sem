@@ -5,7 +5,7 @@ import Loader from '../common/Loader';
 import { Button, Grid, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert';
 import { withStyles } from "@material-ui/core/styles";
-
+import AuthService from '../../services/AuthService';
 
 const styles = theme =>({
 
@@ -61,13 +61,33 @@ class Login extends Component {
                 status:200,
                 data:{
                     success: true,
-                    message: "Data Success"
+                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlBBTUtBWUEiLCJpYXQiOjE1MTYyMzkwMjJ9.-H9NZ1JHZ4tO79UM80CmJ3dw3xj2vgsLkJpZ25bCzaw",
+                    message: "Data Success",
+                    data:{
+                        name:'kamal',
+                        email:'kamal@gmail.com',
+                        isAdmin: false,
+                        user_type: 'Researcher'
+                    }
                 }
             }
             if(res.status == 200){
                 if(res.data.success){
+                    var userData = res.data.data;
+                    var token = res.data.token;
+
                     messageRes = res.data.message;
                     variantRes = "success";
+
+                    AuthService.setUserDataToLocal(userData, token);
+                    
+                    if(userData.isAdmin){
+                        window.location.href = '/admin';
+                    }
+                    else{
+                        window.location.href = '/';
+                    }
+
                 }
                 else{
                     messageRes = res.data.message;
