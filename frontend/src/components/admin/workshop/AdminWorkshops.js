@@ -118,7 +118,6 @@ class AdminWorkshops extends Component {
                                         <TableCell className={classes.tableHeader} align="center">Title</TableCell>
                                         <TableCell className={classes.tableHeader} align="center">Date</TableCell>
                                         <TableCell className={classes.tableHeader} align="center">Time</TableCell>
-                                        <TableCell className={classes.tableHeader} align="center">No of Materials</TableCell>
                                         <TableCell className={classes.tableHeader} align="center">Conference</TableCell>
                                         <TableCell className={classes.tableHeader} align="center">Actions</TableCell>
                                     </TableRow>
@@ -130,7 +129,6 @@ class AdminWorkshops extends Component {
                                         <TableCell className={classes.tableCell} >{row.title}</TableCell>
                                         <TableCell className={classes.tableCell} >{row.year}</TableCell>
                                         <TableCell className={classes.tableCell} >{row.venue}</TableCell>
-                                        <TableCell className={classes.tableCell} >5</TableCell>
                                         <TableCell className={classes.tableCell} >{row.venue}</TableCell>
                                         <TableCell className={classes.tableCell} >
                                             <Tooltip title="Edit" arrow>

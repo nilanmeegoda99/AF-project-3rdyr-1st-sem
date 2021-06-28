@@ -7,9 +7,9 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Alert } from '@material-ui/lab';
-import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-
 import Loader from '../../common/Loader';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import workshopImage from 'url:../../../../public/images/workshopImage.jpg';
 
 const styles = theme =>({
 
@@ -19,8 +19,8 @@ const styles = theme =>({
         // minWidth: '360px',
     },
     formGrid: {
-        paddingLeft: 160,
-        paddingRight: 160,
+        paddingLeft: 30,
+        paddingRight: 30,
     },
     
 });
@@ -33,13 +33,14 @@ const initialState = {
     loading: false,
     dialogBox: false,
     snackbar: false,
-    noOfFiles:0,
+    noOfFiles: 0,
 
     formData: {
-        type: '',
+        title: '',
         description: '',
         attachments: [],
         conference: '',
+        created_by: '',
     },
     conferences: [
         {
@@ -48,19 +49,9 @@ const initialState = {
     
         },
     ],
-    types:[
-        {
-            key: 1,
-            value: 'Workshop'
-        },
-        {
-            key: 2,
-            value: 'Research'
-        },
-    ],
     
 };
-class CreateTemplate extends Component {
+class CreateWorkshop extends Component {
 
     constructor(props){
         super(props);
@@ -70,6 +61,7 @@ class CreateTemplate extends Component {
         this.handleDialogBoxButton = this.handleDialogBoxButton.bind(this); 
         this.setSelectedValue = this.setSelectedValue.bind(this); 
         this.handleFileUpload = this.handleFileUpload.bind(this); 
+        this.closeSnackBar = this.closeSnackBar.bind(this); 
 
     }
 
@@ -144,7 +136,7 @@ class CreateTemplate extends Component {
             dialogBox: false,
         })
 
-        window.location.reload(false);
+        window.location.href = "/workshops/";
     }
 
     setSelectedValue = (name, value) => {
@@ -196,19 +188,20 @@ class CreateTemplate extends Component {
                 })
             }
         }
-
-        var no = 0;
+        
+        var no_files = 0;
         data['attachments'] = files;
-        no = files.length;
+        no_files = files.length;
 
         this.setState({
             formData: data,
-            noOfFiles: no,
+            noOfFiles: no_files,
         })
 
         console.log(this.state.formData);
     };
 
+    
     closeSnackBar = (event, response) => {
         this.setState({
             snackbar: false,
@@ -244,12 +237,18 @@ class CreateTemplate extends Component {
 
         return (
             <div>
-                <Grid container alignItems="center" justify="center" direction="column">
+                <Grid container>
 
-                    <Grid item xs={12} md={12}>
+                    { this.state.isLargeScreen && 
+                        <Grid item xs={12} md={6}>
+                            <img src={workshopImage} alt="" width="100%" height="550"/>
+                        </Grid>
+                    }
+
+                    <Grid item xs={12} md={6}>
                         
                         <Typography variant="h4" className="pt-5 text-center">
-                            Create Template
+                            Create Workshop
                         </Typography>
 
                         {/* Loading */}
@@ -260,25 +259,22 @@ class CreateTemplate extends Component {
                         }
                         <ValidatorForm onSubmit={this.fromSubmit}>
 
-                            <Grid container className={ this.state.isLargeScreen ? classes.formGrid : "py-3 px-3" }>
+                            <Grid container className={classes.formGrid}>
                                 
                                 <Grid item xs={12} md={12} className={classes.inputElement}>
-                                    <Autocomplete
+                                    <TextValidator
                                         className="mt-4"
+                                        placeholder="Title"
+                                        helperText="Enter Title"
+                                        variant="outlined"
+                                        size="small"
                                         fullWidth
-                                        options={this.state.types}
-                                        getOptionLabel={(opt) => opt.value}
-                                        name="type"
-                                        size='small'
-                                        // value={{value: this.state.formData.type}}
-                                        onChange={(e,v) => this.setSelectedValue("type", v == null ? null : v.value) }
-                                        renderInput={(params) =><TextValidator {...params} variant="outlined"
-                                            placeholder="Select Type"
-                                            helperText="Select Type"
-                                            value={this.state.formData.type == '' ? '' : this.state.formData.type}
-                                            validators={["required"]}
-                                            errorMessages={["User Type is required!"]}
-                                        /> }
+                                        type="text"
+                                        name="title"
+                                        value={this.state.formData.title}
+                                        onChange={(e) => this.handleChange(e)} 
+                                        validators={['required']}
+                                        errorMessages={['This field is required']}
                                     />
                                 </Grid>
 
@@ -357,39 +353,38 @@ class CreateTemplate extends Component {
 
                             </Grid>
 
-                            {/* Dialog box */}
-                            <Dialog open={this.state.dialogBox}>
-
-                                <DialogContent>
-                                    <Alert severity={this.state.variant}>
-                                        <Typography variant="h5">
-                                            {this.state.message}
-                                        </Typography>
-                                    </Alert>
-                                    <div className="text-center my-2">
-                                        <Button 
-                                            variant="contained" 
-                                            color="secondary" 
-                                            onClick={this.handleDialogBoxButton}>
-                                            OK
-                                        </Button>
-                                    </div>
-                                </DialogContent>
-                                
-                            </Dialog>
-
                         </ValidatorForm>
                     </Grid>
+                    
+                    {/* Dialog box */}
+                    <Dialog open={this.state.dialogBox}>
+
+                        <DialogContent>
+                            <Alert severity={this.state.variant}>
+                                <Typography variant="h5">
+                                    {this.state.message}
+                                </Typography>
+                            </Alert>
+                            <div className="text-center my-2">
+                                <Button 
+                                    variant="contained" 
+                                    color="secondary" 
+                                    onClick={this.handleDialogBoxButton}>
+                                    OK
+                                </Button>
+                            </div>
+                        </DialogContent>
+                        
+                    </Dialog>
 
                     <Snackbar open={this.state.snackbar}  autoHideDuration={2500} onClose={this.closeSnackBar} name="snackBar">
                         <Alert severity={this.state.variant} onClose={this.closeSnackBar} >{this.state.message}</Alert>
                     </Snackbar>
-                    
+
                 </Grid>
             </div>
         )
     }
 }
 
-export default withStyles(styles)(CreateTemplate);
-
+export default withStyles(styles)(CreateWorkshop);

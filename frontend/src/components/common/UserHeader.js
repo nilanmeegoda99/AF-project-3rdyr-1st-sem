@@ -95,7 +95,7 @@ class UserHeader extends Component {
                                     { this.state.user.user_type == "Researcher" &&
                                         <>
                                             <li><hr className="dropdown-divider" /></li>
-                                            <li><Link className="dropdown-item" to="/research/my">My Researches</Link></li>
+                                            <li><Link className="dropdown-item" to="/researches/">My Researches</Link></li>
                                         </>
                                     }
                                 </ul>
@@ -107,13 +107,13 @@ class UserHeader extends Component {
                                     For Workshop
                                 </a>
                                 <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><Link className="dropdown-item" to="/workshop/instructions">Instructions</Link></li>
-                                    <li><Link className="dropdown-item" to="/workshop/published">Workshops</Link></li>
+                                    <li><Link className="dropdown-item" to="/workshops/instructions">Instructions</Link></li>
+                                    <li><Link className="dropdown-item" to="/workshops/published">Workshops</Link></li>
 
                                     { this.state.user.user_type == "Workshop Coordinator" &&
                                         <>
                                             <li><hr className="dropdown-divider" /></li>
-                                            <li><Link className="dropdown-item" to="/workshop/my">My Workshops</Link></li>
+                                            <li><Link className="dropdown-item" to="/workshops/">My Workshops</Link></li>
                                         </>
                                     }
                                 </ul>
@@ -139,17 +139,8 @@ class UserHeader extends Component {
                             { 
                                 this.state.user.authorized ? 
                                 (<>
-                                    <li className="nav-item dropdown">
-                                        <a className="nav-link dropdown-toggle" id="navbarDropdown" role="button"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                            Profile
-                                        </a>
-                                        <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                            
-                                            <li><Link className="dropdown-item" to="/user/activity">Activity</Link></li>
-                                            <li><Link className="dropdown-item" to="/user/notifications">Notifications</Link></li>
-                                            <li><Link className="dropdown-item" to="/user/profile">Profile</Link></li>
-                                        </ul>
+                                    <li className="nav-item">
+                                        <Link className="nav-link" to="/user/profile">Profile</Link>
                                     </li>
                                     <div className="d-flex">
                                         <button className="btn btn-outline-danger btn-sm" onClick={this.logoutUser}>

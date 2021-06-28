@@ -16,6 +16,37 @@ function getUserDetailsFromStorage(){
     }
 }
 
+
+//check user is logged in
+function UserCommonRoutes({ component: ProComponent, ...rest}){
+
+    // console.log("object",authed, userType)
+    var userDetails = getUserDetailsFromStorage();
+
+    if(userDetails != null){
+        return(
+            <Route
+            { ...rest}
+                render={
+                    (props) => (  userDetails.user_type === "Researcher" || 
+                                    userDetails.user_type === "Workshop Coordinator" ||
+                                    userDetails.user_type === "Attendee"
+                                )?
+                        <ProComponent {...props} />
+                    :
+                    <Redirect to="/session/401" /> 
+                }
+            />
+        )
+    }
+    else{
+        return(
+            <Redirect to="/session/expired" />
+        )
+    }
+
+}
+
 //check user type is researcher
 function ResearcherRoutes({ component: ProComponent, ...rest}){
 
@@ -135,4 +166,5 @@ export{
     WorkshopRoutes,
     AttendeeRoutes,
     UserLoggedIn,
+    UserCommonRoutes,
 }
