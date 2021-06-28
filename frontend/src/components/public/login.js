@@ -66,11 +66,16 @@ class Login extends Component {
                     data:{
                         name:'kamal',
                         email:'kamal@gmail.com',
-                        isAdmin: true,
+                        isAdmin: 
+                            // true,
+                            false,
                         user_type: 
-                        // 'Editor'
-                        'Reviewer'
                         // 'Super Admin'
+                        // 'Editor'
+                        // 'Reviewer'
+                        'Attendee'
+                        // 'Researcher'
+                        // 'Workshop Coordinator'
                     }
                 }
             }

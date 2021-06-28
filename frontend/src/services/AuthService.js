@@ -36,11 +36,16 @@ import axios from 'axios';
                         data:{
                             name:'kamal',
                             email:'kamal@gmail.com',
-                            isAdmin: true,
+                            isAdmin: 
+                                // true,
+                                false,
                             user_type: 
                             // 'Super Admin'
                             // 'Editor'
-                            'Reviewer'
+                            // 'Reviewer'
+                            'Attendee'
+                            // 'Researcher'
+                            // 'Workshop Coordinator'
                         }
                     }
                 }

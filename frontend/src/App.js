@@ -3,8 +3,11 @@ import { BrowserRouter as Router, Redirect, Route, Switch } from "react-router-d
 
 import './static/index.css';
 
-import { ResearcherRoutes, WorkshopRoutes, AttendeeRoutes, UserLoggedIn } from './routes/UserRouteFunctions';
-import { SuperAdminRoutes, AdminCommonRoutes, EditorRoutes, ReviewerRoutes } from './routes/AdminRouteFunctions';
+import { ResearcherRoutes, WorkshopRoutes, AttendeeRoutes, UserLoggedIn, UserCommonRoutes, } 
+from './routes/UserRouteFunctions';
+
+import { SuperAdminRoutes, AdminCommonRoutes, EditorRoutes, ReviewerRoutes, } 
+from './routes/AdminRouteFunctions';
 
 // guest user components
 import Header from "./components/common/Header";
@@ -17,15 +20,29 @@ import Register from "./components/public/Register";
 
 import ResearchInstructions from "./components/users/guest/ResearchInstructions";
 import Researches from "./components/users/guest/Researches";
+
 import Workshops from "./components/users/guest/Workshops";
 import WorkshopInstructions from "./components/users/guest/WorkshopInstructions";
+
 import Downloads from "./components/users/guest/Downloads";
 import AttendeeInstructions from "./components/users/guest/AttendeeInstructions";
 
 //registered user components
 import MyResearch from "./components/users/Research/MyResearch";
+import CreateResearch from "./components/users/Research/CreateResearch";
+import EditResearch from "./components/users/Research/EditResearch";
+import ViewResearch from "./components/users/Research/ViewResearch";
+
 import MyWorkshops from "./components/users/Workshop/MyWorkshops";
+import ViewWorkshop from "./components/users/Workshop/ViewWorkshop";
+import EditWorkshop from "./components/users/Workshop/EditWorkshop";
+import CreateWorkshop from "./components/users/Workshop/CreateWorkshop";
+
 import BookedConferences from "./components/users/Attendee/BookedConferences";
+import CreateBookConference from "./components/users/Attendee/CreateBookConference";
+import ViewBooked from "./components/users/Attendee/ViewBooked";
+
+import ViewProfile from "./components/users/profile/ViewProfile";
 
 // Admin components
 import Dashboard from "./components/admin/Dashboard";
@@ -120,14 +137,30 @@ class App extends Component{
                         <Route exact path="/downloads" component={Downloads} />
                         <Route exact path="/research/instructions" component={ResearchInstructions} />
                         <Route exact path="/research/published" component={Researches} />
-                        <Route exact path="/workshop/instructions" component={WorkshopInstructions} />
-                        <Route exact path="/workshop/published" component={Workshops} />
+                        <Route exact path="/workshops/instructions" component={WorkshopInstructions} />
+                        <Route exact path="/workshops/published" component={Workshops} />
                         <Route exact path="/attendee/instructions" component={AttendeeInstructions} />
+
                         
                         {/* Logged in user Routes */}
-                        <ResearcherRoutes exact path="/research/my" component={MyResearch} />
-                        <WorkshopRoutes exact path="/workshop/my" component={MyWorkshops} />
+                        <UserCommonRoutes exact path="/user/profile" component={ViewProfile} />
+
+                        {/* Researcher */}
+                        <ResearcherRoutes exact path="/researches/" component={MyResearch} />
+                        <ResearcherRoutes exact path="/researches/create" component={CreateResearch} />
+                        <ResearcherRoutes exact path="/researches/:id" component={ViewResearch} />
+                        <ResearcherRoutes exact path="/researches/edit/:id" component={EditResearch} />
+
+                        {/* Workshop Coordinator */}
+                        <WorkshopRoutes exact path="/workshops/" component={MyWorkshops} />
+                        <WorkshopRoutes exact path="/workshops/create" component={CreateWorkshop} />
+                        <WorkshopRoutes exact path="/workshops/:id" component={ViewWorkshop} />
+                        <WorkshopRoutes exact path="/workshops/edit/:id" component={EditWorkshop} />
+
+                        {/* Attendee */}
                         <AttendeeRoutes exact path="/attendee/my" component={BookedConferences} />
+                        <AttendeeRoutes exact path="/attendee/conference/create" component={CreateBookConference} />
+                        <AttendeeRoutes exact path="/attendee/conference/:id" component={ViewBooked} />
 
                         {/* Admin Routes */}
                         {/* Common */}
