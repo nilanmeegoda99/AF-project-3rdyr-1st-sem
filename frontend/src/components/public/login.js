@@ -40,11 +40,11 @@ class Login extends Component {
     constructor(props){
         super(props);
         this.state = initialState;
-        this.fromSubmit = this.fromSubmit.bind(this);
+        this.formSubmit = this.formSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
 
-    fromSubmit(e){
+    formSubmit(e){
         e.preventDefault();
 
         this.setState({
@@ -66,8 +66,11 @@ class Login extends Component {
                     data:{
                         name:'kamal',
                         email:'kamal@gmail.com',
-                        isAdmin: false,
-                        user_type: 'Researcher'
+                        isAdmin: true,
+                        user_type: 
+                        // 'Editor'
+                        'Reviewer'
+                        // 'Super Admin'
                     }
                 }
             }
@@ -145,7 +148,7 @@ class Login extends Component {
                         this.state.loading && <Loader />
                     }
 
-                    <ValidatorForm onSubmit={this.fromSubmit}>
+                    <ValidatorForm onSubmit={this.formSubmit}>
 
                         <Grid container alignItems="center" justify="center" direction="column">
 

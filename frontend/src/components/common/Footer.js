@@ -3,14 +3,14 @@ import React, {Component} from 'react';
 class Footer extends Component {
     render() {
         return (
-            <footer>
+            <footer className="bg-dark text-center text-lg-start">
                 <div className='text-center py-3' 
                     style={{ 
-                            backgroundColor:'#343A40', 
+                            // backgroundColor:'#343A40', 
                             color: '#ffffff80',
-                            bottom: 0,
-                            position: 'relative',
-                            width:'100%', 
+                            // bottom: 0,
+                            // position: 'relative',
+                            // width:'100%', 
                         }}
                     >
                     Copyright @ 2021S1_REG_WE_38

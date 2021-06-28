@@ -93,8 +93,8 @@ class AdminHeader extends Component {
                                     </a>
                                     <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                                         <>
-                                            <li><Link className="dropdown-item" to="/admin/conference/add">Create Conference</Link></li>
-                                            <li><Link className="dropdown-item" to="/admin/conference/events">Conference Events</Link></li>
+                                            <li><Link className="dropdown-item" to="/admin/conference/create">Create Conference</Link></li>
+                                            <li><Link className="dropdown-item" to="/admin/events">Conference Events</Link></li>
                                             <li><Link className="dropdown-item" to="/admin/conferences">All Conferences</Link></li>
                                         </>
                                     </ul>
@@ -115,7 +115,7 @@ class AdminHeader extends Component {
                             this.state.user.user_type == "Editor" &&
                             <>
                                 <li className="nav-item">
-                                    <Link className="nav-link" aria-current="page" to="/admin/conference/events">Events</Link>
+                                    <Link className="nav-link" aria-current="page" to="/admin/events">Events</Link>
                                 </li>
                             </>
                         }
@@ -127,6 +127,9 @@ class AdminHeader extends Component {
                                 </li>
                                 <li className="nav-item">
                                     <Link className="nav-link" aria-current="page" to="/admin/researches">Researches</Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link className="nav-link" aria-current="page" to="/admin/templates">Templates</Link>
                                 </li>
                             </>
                         }
