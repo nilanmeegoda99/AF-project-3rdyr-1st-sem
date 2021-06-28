@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import colors from 'colors'
 import cors from 'cors'
 import connectDB from './src/config/db.js'
+import userRoute from './src/routes/userRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -17,6 +18,9 @@ app.use(bodyParser.json())
 app.get('/', (req, res) => {
   res.send('Api is working')
 });
+
+//directing api calls to relavent routes
+app.use('/api/users', userRoute)
 
 
 
