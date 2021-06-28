@@ -1,28 +1,27 @@
-import Workshop from "../models/workshopModel.js";
+import Event from "../models/eventModel.js";
 
-// @desc  Create Workshop
-// @route POST /api/workshops
-// @access Public Workshop Coordinator
+// @desc  Create Event
+// @route POST /api/events
+// @access Admin Editor
 
-const createWorkshop = async(req, res) => {
+const createEvent = async(req, res) => {
 
     if(req.body){
-        const workshopDetails = {
+        const eventDetails = {
             title: req.body.title,
-            date: req.body.date,
-            time: req.body.time,
+            startDate: req.body.startDate,
+            endDate: req.body.startDate,
             description: req.body.description,
+            otherDetails: req.body.otherDetails,
             conference: req.body.conference,
-            attachment: req.body.attachment,
-            user: req.body.user,
             is_Approved: false,
         };
 
-        const workshop = new Workshop(workshopDetails)
+        const event = new Event(eventDetails)
         
-        await workshop.save()
+        await event.save()
         .then( data => {
-            res.status(201).send({ success: true, 'message': "Workshop Created Successfully!" })
+            res.status(201).send({ success: true, 'message': "Event Created Successfully!" })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -33,32 +32,32 @@ const createWorkshop = async(req, res) => {
     }
 }
 
-// @desc  Get All Workshops
-// @route GET /api/workshops
-// @access Public Workshop Coordinator
+// @desc  Get All Events
+// @route GET /api/events
+// @access Admin Editor
 
-const getAllWorkshops = async(req, res) => {
+const getAllEvents = async(req, res) => {
 
-    await Workshop.find({})
+    await Event.find({})
     .then( data => {
-        res.status(200).send({ success: true, 'workshops': data })
+        res.status(200).send({ success: true, 'event': data })
     })
     .catch( (error) => {
         res.status(500).send({ success: false, 'message': error })
     } )
 }
 
-// @desc  Get Workshop by ID
-// @route GET /api/workshops:id
-// @access Public Workshop Coordinator
+// @desc  Get Event by ID
+// @route GET /api/events:id
+// @access Admin Editor
 
-const getWorkshopByID = async(req, res) => {
+const getEventByID = async(req, res) => {
 
     if(req.params && req.params.id){
         
-        await Workshop.findById(req.params.id)
+        await Event.findById(req.params.id)
         .then( data => {
-            res.status(200).send({ success: true, 'workshops': data })
+            res.status(200).send({ success: true, 'events': data })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -70,26 +69,27 @@ const getWorkshopByID = async(req, res) => {
 }
 
 
-// @desc  Update Workshop
-// @route PUT /api/workshops:id
-// @access Public Workshop Coordinator
+// @desc  Update Event
+// @route PUT /api/events:id
+// @access Admin Editor
 
-const updateWorkshopDetails = async(req, res) => {
+const updateEventDetails = async(req, res) => {
 
     if(req.body && req.params){
 
         const query = { "_id": req.params.id };
         const update = { 
             title: req.body.title,
-            date: req.body.date,
-            time: req.body.time,
+            startDate: req.body.startDate,
+            endDate: req.body.endDate,
             description: req.body.description,
+            otherDetails: req.body.otherDetails,
          };
         
-        await Workshop.updateOne( query , update)
+        await Event.updateOne( query , update)
         .then( result => {
             // console.log(result.modifiedCount);
-            res.status(201).send({ success: true, 'message': "Workshop Updated Successfully!" })
+            res.status(201).send({ success: true, 'message': "Event Updated Successfully!" })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -100,17 +100,17 @@ const updateWorkshopDetails = async(req, res) => {
     }
 }
 
-// @desc  Delete Workshop
-// @route Delete /api/workshops:id
-// @access Public Workshop Coordinator
+// @desc  Delete Event
+// @route Delete /api/events:id
+// @access Admin Editor
 
-const deleteWorkshopDetails = async(req, res) => {
+const deleteEventDetails = async(req, res) => {
 
     if(req.params && req.params.id){
         
-        await Workshop.deleteOne( {"_id":req.params.id} )
+        await Event.deleteOne( {"_id":req.params.id} )
         .then( result => {
-            res.status(201).send({ success: true, 'message': "Workshop Deleted Successfully!" })
+            res.status(201).send({ success: true, 'message': "Event Deleted Successfully!" })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -120,11 +120,11 @@ const deleteWorkshopDetails = async(req, res) => {
     }
 }
 
-// @desc  Approve Workshop
-// @route Put /api/workshops:id
-// @access Admin Reviewer
+// @desc  Approve Event
+// @route Put /api/events:id
+// @access Super Admin
 
-const approveWorkshop = async(req, res) => {
+const approveEvent = async(req, res) => {
 
     if(req.body && req.params){
 
@@ -133,10 +133,10 @@ const approveWorkshop = async(req, res) => {
             "is_Approved": req.body.is_Approved,
          };
         
-        await Workshop.updateOne( query , update)
+        await Event.updateOne( query , update)
         .then( result => {
             // console.log(result.modifiedCount);
-            res.status(201).send({ success: true, 'message': "Workshop Approved Status Updated Successfully!" })
+            res.status(201).send({ success: true, 'message': "Event Approved Status Updated Successfully!" })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -148,10 +148,10 @@ const approveWorkshop = async(req, res) => {
 }
 
 export default{
-    createWorkshop,
-    getAllWorkshops,
-    getWorkshopByID,
-    updateWorkshopDetails,
-    deleteWorkshopDetails,
-    approveWorkshop,
+    createEvent,
+    getAllEvents,
+    getEventByID,
+    updateEventDetails,
+    deleteEventDetails,
+    approveEvent,
 }

@@ -5,6 +5,12 @@ import colors from 'colors'
 import cors from 'cors'
 import connectDB from './src/config/db.js'
 import userRoute from './src/routes/userRoutes.js'
+import conferenceRoutes from './src/routes/conferenceRoutes.js'
+import eventsRoutes from './src/routes/eventsRoutes.js'
+import workshopRoutes from './src/routes/workshopRoutes.js'
+import notificationRoutes from './src/routes/notificationRoutes.js'
+import downloadableRoutes from './src/routes/downloadableRoutes.js'
+import bookingRoutes from './src/routes/bookingRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -14,15 +20,20 @@ app.use(cors())
 app.use(bodyParser.json())
 
 
-
 app.get('/', (req, res) => {
   res.send('Api is working')
 });
 
+
 //directing api calls to relavent routes
 app.use('/api/users', userRoute)
+app.use('/api/conferences', conferenceRoutes)
+app.use('/api/events', eventsRoutes)
+app.use('/api/workshops', workshopRoutes)
 
-
+app.use('/api/notifications', notificationRoutes)
+app.use('/api/bookings', bookingRoutes)
+app.use('/api/materials', downloadableRoutes)
 
 const PORT = process.env.PORT || 8080
 

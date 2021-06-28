@@ -1,43 +1,38 @@
 import mongoose from 'mongoose';
 
-const WorkshopModel = mongoose.Schema({
+const eventModel = mongoose.Schema({
 
     title: {
         type: String,
+        required: true,
+    },
+    startDate: {
+        type: String,
+        required: true,
+    },
+    endDate: {
+        type: String,
+        required: true,
+    },
+    is_Approved : {
+        type: Boolean,
         required: true,
     },
     description: {
         type: String,
         required: true,
     },
-    date: {
+    otherDetails: {
         type: String,
-        required: true,
+        required: false,
     },
-    time: {
-        type: String,
-        required: true,
-    },
-    is_Approved:{
-        type: Boolean,
-        required: true,
-    },
-    attachment:{
-        type: String,
-        required: true,
-    },
-    conference:{
+    conference: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref:'conference'
-    },
-    user:{
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref:'users'
-    },
+    }
         
 });
 
-const Workshop = mongoose.model('workshop', WorkshopModel);
-export default Workshop;
+const Event = mongoose.model('event', eventModel);
+export default Event;

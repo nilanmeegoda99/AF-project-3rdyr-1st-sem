@@ -1,12 +1,8 @@
 import mongoose from 'mongoose';
 
-const ResearchModel = mongoose.Schema({
+const BookingModel = mongoose.Schema({
 
-    title: {
-        type: String,
-        required: true,
-    },
-    description: {
+    token: {
         type: String,
         required: true,
     },
@@ -18,25 +14,17 @@ const ResearchModel = mongoose.Schema({
         type: String,
         required: true,
     },
-    is_Approved:{
-        type: Boolean,
-        required: true,
-    },
-    is_Paid:{
-        type: Boolean,
-        required: true,
-    },
-    completed:{
-        type: Boolean,
-        required: true,
-    },
-    attachment:{
+    status: {
         type: String,
+        required: true,
+    },
+    isPaid: {
+        type: Boolean,
         required: true,
     },
     payment:{
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
+        required: false,
         ref:'payment'
     },
     conference:{
@@ -52,5 +40,5 @@ const ResearchModel = mongoose.Schema({
         
 });
 
-const Research = mongoose.model('Research', ResearchModel);
-export default Research;
+const Booking = mongoose.model('booking', BookingModel);
+export default Booking;

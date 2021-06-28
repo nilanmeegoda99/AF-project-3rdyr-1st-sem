@@ -32,8 +32,6 @@ const protect = asyncHandler(async(req,res, next) => {
         throw new Error('a token is not availabe, cannot be authorized')
     }
 
-   
-
 })
 
 const admin = (req,res,next) => {
