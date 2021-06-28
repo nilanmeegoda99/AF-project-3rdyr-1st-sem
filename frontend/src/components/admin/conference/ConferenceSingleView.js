@@ -3,6 +3,7 @@ import {
     Grid, Typography, Card, CardContent, Button,
 }
 from '@material-ui/core';
+import { Link } from 'react-router-dom';
 import { withStyles } from "@material-ui/core/styles";
 
 const styles = theme =>({
@@ -18,9 +19,20 @@ const styles = theme =>({
 
 });
 
-class ConferenceDetails extends Component {
-    render() {
+class ConferenceSingleView extends Component {
 
+    constructor(props){
+        super(props);
+        this.state = {
+            
+        }
+    }
+
+    componentDidMount(){
+
+    }
+
+    render() {
         const { classes } = this.props;
 
         return (
@@ -30,7 +42,7 @@ class ConferenceDetails extends Component {
                     <Grid item xs={12} md={12}>
                         <Card className={classes.detailsCard}>
                             <CardContent>
-                                <Typography variant="h4" >ACTIVE CONFERENCE : Title</Typography>
+                                <Typography variant="h4" >CONFERENCE : Title</Typography>
                                 <hr />
                                 <Typography variant="body1" className={classes.detailsRow}>
                                     <b>Start Date</b>: 2020/01/01
@@ -72,14 +84,6 @@ class ConferenceDetails extends Component {
                                             Contrary to popular belief, Lorem Ipsum is not simply random text. 
                                             It has roots in a piece of classical Latin literature from 45 BC, making it over 
                                             2000 years old.
-
-                                            <br />
-                                            <button 
-                                                className="btn btn-outline-success btn-sm my-3 float-end" 
-                                                onClick={() => window.location.href = "/admin/"}
-                                            >
-                                                View
-                                            </button>
                                         </CardContent>
                                     </Card>
                                     <Card>
@@ -89,20 +93,21 @@ class ConferenceDetails extends Component {
                                             Contrary to popular belief, Lorem Ipsum is not simply random text. 
                                             It has roots in a piece of classical Latin literature from 45 BC, making it over 
                                             2000 years old.
-
-                                            <br />
-                                            <button 
-                                                className="btn btn-outline-success btn-sm my-3 float-end" 
-                                                onClick={() => window.location.href = "/admin/"}
-                                            >
-                                                View
-                                            </button>
-
                                         </CardContent>
                                     </Card>
 
                                 </div>
 
+                                <Link to="/admin/conferences/edit/1">
+                                    <Button 
+                                        className="mt-3 float-end"
+                                        // onClick={() => window.location.href = "/admin/conferences/edit/1"}
+                                        variant="contained"
+                                        color="primary"
+                                    >
+                                        Edit
+                                    </Button>
+                                </Link>
 
                             </CardContent>                            
                         </Card>
@@ -114,4 +119,4 @@ class ConferenceDetails extends Component {
     }
 }
 
-export default withStyles(styles)(ConferenceDetails);
+export default withStyles(styles)(ConferenceSingleView);

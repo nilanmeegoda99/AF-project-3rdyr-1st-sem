@@ -42,13 +42,13 @@ class Register extends Component {
     constructor(props){
         super(props);
         this.state = initialState;
-        this.fromSubmit = this.fromSubmit.bind(this);
+        this.formSubmit = this.formSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleSelection = this.handleSelection.bind(this);
         this.setSelectedValue = this.setSelectedValue.bind(this);
     }
 
-    fromSubmit(e){
+    formSubmit(e){
         e.preventDefault();
 
         this.setState({
@@ -154,7 +154,7 @@ class Register extends Component {
                         this.state.loading && <Loader />
                     }
 
-                    <ValidatorForm onSubmit={this.fromSubmit}>
+                    <ValidatorForm onSubmit={this.formSubmit}>
 
                         <Grid container alignItems="center" justify="center" direction="column">
 

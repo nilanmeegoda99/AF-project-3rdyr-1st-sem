@@ -1,4 +1,8 @@
 import React, { Component } from 'react'
+import { 
+    Grid, Typography
+} from '@material-ui/core'
+import { Autocomplete } from '@material-ui/lab';
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import { Button, Grid, Typography } from '@material-ui/core'
 import { withStyles } from "@material-ui/core/styles";
@@ -8,15 +12,21 @@ import DialogActions from '@material-ui/core/DialogActions';
 import { Alert } from '@material-ui/lab';
 
 import Loader from '../../common/Loader';
-import create_conference from 'url:../../../../public/images/create_conference.jpg';
-
 
 const styles = theme =>({
-
+    
+    root:{
+        paddingLeft: 250,
+        paddingRight: 250,
+    },
     inputElement:{
         paddingLeft: 15,
         paddingRight: 15,
         // minWidth: '360px',
+    },
+    formGrid: {
+        paddingLeft: 30,
+        paddingRight: 30,
     },
 
 });
@@ -35,16 +45,28 @@ const initialState = {
         venue: '',
         startDate: '',
         endDate: '',
+        otherDetails: '',
+        conference: '',
     },
+    conferences: [
+        {
+            key: 1,
+            value: 'Sample Conference'
+    
+        },
+    ],
+    
 };
-class CreateConference extends Component {
+
+class EditEvent extends Component {
 
     constructor(props){
         super(props);
         this.state = initialState;
         this.fromSubmit = this.fromSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.handleDialogBoxButton = this.handleDialogBoxButton.bind(this);
+        this.handleDialogBoxButton = this.handleDialogBoxButton.bind(this); 
+        this.setSelectedValue = this.setSelectedValue.bind(this); 
 
     }
 
@@ -119,7 +141,20 @@ class CreateConference extends Component {
             dialogBox: false,
         })
 
-        window.location.reload(false);
+        window.location.href = "/admin/events";
+    }
+
+    setSelectedValue = (name, value) => {
+
+        var data = this.state.formData;
+        data[name] = value;
+
+        this.setState({
+            formData: data,
+        })
+
+        // console.log(this.state);
+
     }
 
     componentDidMount(){
@@ -151,30 +186,25 @@ class CreateConference extends Component {
 
         return (
             <div>
-                <Grid container>
+                <Grid container className={ this.state.isLargeScreen ? classes.root : "px-1"}>
 
-                    { this.state.isLargeScreen && 
-                        <Grid item xs={12} md={6}>
-                            <img src={create_conference} alt="" width="100%" height="550"/>
-                        </Grid>
-                    }
-
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={12}>
                         
                         <Grid container alignItems="center" justify="center" direction="column">
                             
-                            <Typography variant="h4" className="pt-5 pb-3">
-                                Create Conference
+                            <Typography variant="h4" className="pt-5">
+                                Edit Event
                             </Typography>
 
                             {/* Loading */}
-                            {
-                                this.state.loading != false && <Loader />
+                            { this.state.loading != false && 
+                                <div className="mt-4">
+                                    <Loader/>
+                                </div>
                             }
-
                             <ValidatorForm onSubmit={this.fromSubmit}>
 
-                                <Grid container>
+                                <Grid container className={classes.formGrid}>
 
                                     <Grid item xs={12} md={12} className={classes.inputElement}>
                                         <TextValidator
@@ -204,8 +234,27 @@ class CreateConference extends Component {
                                             type="text"
                                             name="description"
                                             multiline={true}
-                                            rows={4}
+                                            rows={3}
                                             value={this.state.formData.description}
+                                            onChange={(e) => this.handleChange(e)} 
+                                            validators={['required']}
+                                            errorMessages={['This field is required']}
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={12} md={12} className={classes.inputElement}>
+                                        <TextValidator
+                                            className="mt-4"
+                                            placeholder="Other Details"
+                                            helperText="Enter Other Details"
+                                            variant="outlined"
+                                            size="small"
+                                            fullWidth
+                                            type="text"
+                                            name="otherDetails"
+                                            multiline={true}
+                                            rows={3}
+                                            value={this.state.formData.otherDetails}
                                             onChange={(e) => this.handleChange(e)} 
                                             validators={['required']}
                                             errorMessages={['This field is required']}
@@ -247,26 +296,29 @@ class CreateConference extends Component {
                                     </Grid>
                                     
                                     <Grid item xs={12} md={12} className={classes.inputElement}>
-                                        <TextValidator
+                                        <Autocomplete
                                             className="mt-4"
-                                            placeholder="Venue"
-                                            helperText="Enter Venue"
-                                            variant="outlined"
-                                            size="small"
                                             fullWidth
-                                            type="text"
-                                            name="venue"
-                                            value={this.state.formData.venue}
-                                            onChange={(e) => this.handleChange(e)} 
-                                            validators={['required']}
-                                            errorMessages={['This field is required']}
+                                            options={this.state.conferences}
+                                            getOptionLabel={(opt) => opt.value}
+                                            name="conference"
+                                            size='small'
+                                            // value={{value: this.state.formData.conference}}
+                                            onChange={(e,v) => this.setSelectedValue("conference", v == null ? null : v.value) }
+                                            renderInput={(params) =><TextValidator {...params} variant="outlined"
+                                                placeholder="Select Conference"
+                                                helperText="Select Conference"
+                                                value={this.state.formData.conference == '' ? '' : this.state.formData.conference}
+                                                validators={["required"]}
+                                                errorMessages={["User Type is required!"]}
+                                            /> }
                                         />
                                     </Grid>
                                                                     
                                     <Grid item xs={12} md={12}>
                                         <div className="text-center my-3">
                                             <Button variant="contained" color="primary" type="submit">
-                                                Create
+                                                Update
                                             </Button>
                                         </div>
                                     </Grid>
@@ -308,5 +360,4 @@ class CreateConference extends Component {
     }
 }
 
-export default withStyles(styles)(CreateConference);
-
+export default withStyles(styles)(EditEvent);

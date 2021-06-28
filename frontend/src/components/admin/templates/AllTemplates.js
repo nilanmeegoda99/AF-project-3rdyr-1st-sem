@@ -3,15 +3,19 @@ import { Link } from 'react-router-dom';
 import { Grid, Typography, Paper, Tooltip,
     Table, TableBody, TableCell, TableHead, TableRow, TableContainer
 } from '@material-ui/core';
- import { withStyles } from "@material-ui/core/styles";
- import Loader from '../../common/Loader';
- import EditIcon from '@material-ui/icons/Edit';
- import DeleteIcon from '@material-ui/icons/Delete';
- import CheckIcon from '@material-ui/icons/Check';
- import CloseIcon from '@material-ui/icons/Close';
+import { withStyles } from "@material-ui/core/styles";
+import Loader from '../../common/Loader';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
+import AuthService from '../../../services/AuthService';
 
 const styles = theme =>({
 
+    root:{
+        marginBottom: 20,
+    },
     table: {
         // minWidth: 650,
     },
@@ -24,14 +28,14 @@ const styles = theme =>({
     deleteButtonIcon: {
         color:"#B8BFBE",
         '&:hover':{
-            color:"#C91212",
+            color:"red",
         },
     },
     activeButtonIcon: {
         color:"#0B9D16",
     },
     deActiveButtonIcon: {
-        color:"#EDAA26",
+        color:"#C91200",
     },
     tableHeader: {
         fontWeight: 'bold',
@@ -53,6 +57,8 @@ const initialState = {
     isLargeScreen: true,
     loading: false,
 
+    adminRole: '',
+
     rows: [
         {
             title: "aghkhjbc gk hjkhj",
@@ -64,38 +70,60 @@ const initialState = {
             title: "uiouio oiuu oipop",
             year: "2020/07/07",
             year: "2020/07/07",
-            venue: "rtyrty rtyty  tyrtyrt",
+            venue: "rtyrty rtyty tyrtyrt",
         },
-        {
-            title: "abc acs asdsa",
-            year: "2019/06/15",
-            year: "2019/06/15",
-            venue: "asdsa asdsad  sads",
-        },
+
     ]
     
 };
 
-class AllConferences extends Component {
+class AllTemplates extends Component {
 
     constructor(props){
         super(props);
         this.state = initialState;
     }
+    
+    componentDidMount(){
+
+        var localStorageData = AuthService.getUserData();
+        // console.log("User Data",localStorageData);
+
+        var role = localStorageData.userData.user_type;
+
+        this.setState({
+            adminRole: role,
+        });
+    }
 
     render() {
 
         const { classes } = this.props;
-
         return (
-            <div>
+            <div className={classes.root}>
                 <Grid container alignItems="center" justify="center" direction="column">
 
                     <Grid item xs={12} md={12}>
-                        <Typography variant="h4" className="py-3">
-                            All Conferences
+                        <Typography variant="h4" className="py-3 text-center">
+                            All Templates
                         </Typography>
                     </Grid>
+
+                    { this.state.adminRole === 'Reviewer' && 
+                        <Grid item xs={12} md={12}>
+                            <div style={{ marginBottom: 20, padding:10, position: 'relative', float: 'right' }}>
+                                
+                                <Link to="/admin/templates/create">
+                                    <button
+                                        type="button" 
+                                        className="btn btn-outline-primary"
+                                    >
+                                        Add New Template
+                                    </button>
+                                </Link>
+                            </div>
+                        </Grid>
+                    }
 
                     <Grid item xs={12} md={12}>
 
@@ -103,10 +131,9 @@ class AllConferences extends Component {
                             <Table className={classes.table} aria-label="customized table" size="medium" >
                                 <TableHead>
                                     <TableRow className={classes.tableHeaderRow}>
-                                        <TableCell className={classes.tableHeader} align="center">Title</TableCell>
-                                        <TableCell className={classes.tableHeader} align="center">Start Date</TableCell>
-                                        <TableCell className={classes.tableHeader} align="center">End Date</TableCell>
-                                        <TableCell className={classes.tableHeader} align="center">Venue</TableCell>
+                                        <TableCell className={classes.tableHeader} align="center">Conference</TableCell>
+                                        <TableCell className={classes.tableHeader} align="center">Type</TableCell>
+                                        <TableCell className={classes.tableHeader} align="center">Description</TableCell>
                                         <TableCell className={classes.tableHeader} align="center">Actions</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -116,20 +143,19 @@ class AllConferences extends Component {
                                     <TableRow key={row.title} hover>
                                         <TableCell className={classes.tableCell} >{row.title}</TableCell>
                                         <TableCell className={classes.tableCell} >{row.year}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.year}</TableCell>
                                         <TableCell className={classes.tableCell} >{row.venue}</TableCell>
                                         <TableCell className={classes.tableCell} >
                                             <Tooltip title="Edit" arrow>
-                                                <Link to="/admin/conferences/1">
+                                                <Link to="/admin/templates/1">
                                                     <EditIcon className={classes.editButtonIcon}></EditIcon>
                                                 </Link>
                                             </Tooltip>
-                                            <Tooltip title="Active" arrow>
+                                            {/* <Tooltip title="Active" arrow>
                                                 <CheckIcon className={classes.activeButtonIcon}></CheckIcon>
                                             </Tooltip>
-                                            <Tooltip title="Not Active" arrow>
+                                            <Tooltip title="Inactive" arrow>
                                                 <CloseIcon className={classes.deActiveButtonIcon}></CloseIcon>
-                                            </Tooltip>
+                                            </Tooltip> */}
                                             <Tooltip title="Delete" arrow>
                                                 <DeleteIcon className={classes.deleteButtonIcon}></DeleteIcon>
                                             </Tooltip>
@@ -149,5 +175,4 @@ class AllConferences extends Component {
 }
 
 // export default AllConferences;
-export default withStyles(styles)(AllConferences);
-
+export default withStyles(styles)(AllTemplates);

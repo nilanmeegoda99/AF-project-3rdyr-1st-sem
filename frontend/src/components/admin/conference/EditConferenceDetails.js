@@ -1,4 +1,7 @@
 import React, { Component } from 'react'
+import { 
+    Grid, Typography
+} from '@material-ui/core'
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import { Button, Grid, Typography } from '@material-ui/core'
 import { withStyles } from "@material-ui/core/styles";
@@ -8,11 +11,13 @@ import DialogActions from '@material-ui/core/DialogActions';
 import { Alert } from '@material-ui/lab';
 
 import Loader from '../../common/Loader';
-import create_conference from 'url:../../../../public/images/create_conference.jpg';
-
 
 const styles = theme =>({
-
+    
+    root:{
+        paddingLeft: 250,
+        paddingRight: 250,
+    },
     inputElement:{
         paddingLeft: 15,
         paddingRight: 15,
@@ -37,7 +42,7 @@ const initialState = {
         endDate: '',
     },
 };
-class CreateConference extends Component {
+class EditConferenceDetails extends Component {
 
     constructor(props){
         super(props);
@@ -119,19 +124,19 @@ class CreateConference extends Component {
             dialogBox: false,
         })
 
-        window.location.reload(false);
+        window.location.href = "/admin/conferences";
     }
 
     componentDidMount(){
 
-        if(window.innerWidth < 960){
+        if(window.innerWidth < 850){
             this.setState({
                 isLargeScreen: false,
             });
         }
 
         window.addEventListener('resize', () => {
-            if(window.innerWidth < 960){
+            if(window.innerWidth < 850){
                 this.setState({
                     isLargeScreen: false,
                 });
@@ -151,20 +156,14 @@ class CreateConference extends Component {
 
         return (
             <div>
-                <Grid container>
+                <Grid container className={ this.state.isLargeScreen ? classes.root : "py-3"}>
 
-                    { this.state.isLargeScreen && 
-                        <Grid item xs={12} md={6}>
-                            <img src={create_conference} alt="" width="100%" height="550"/>
-                        </Grid>
-                    }
-
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={12}>
                         
                         <Grid container alignItems="center" justify="center" direction="column">
                             
                             <Typography variant="h4" className="pt-5 pb-3">
-                                Create Conference
+                                Edit Conference
                             </Typography>
 
                             {/* Loading */}
@@ -266,7 +265,7 @@ class CreateConference extends Component {
                                     <Grid item xs={12} md={12}>
                                         <div className="text-center my-3">
                                             <Button variant="contained" color="primary" type="submit">
-                                                Create
+                                                Update
                                             </Button>
                                         </div>
                                     </Grid>
@@ -308,5 +307,5 @@ class CreateConference extends Component {
     }
 }
 
-export default withStyles(styles)(CreateConference);
+export default withStyles(styles)(EditConferenceDetails);
 
