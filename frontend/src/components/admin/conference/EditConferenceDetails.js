@@ -1,7 +1,4 @@
 import React, { Component } from 'react'
-import { 
-    Grid, Typography
-} from '@material-ui/core'
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import { Button, Grid, Typography } from '@material-ui/core'
 import { withStyles } from "@material-ui/core/styles";

@@ -14,5 +14,3 @@ class Loader extends Component {
 }
 
 export default Loader;
-
-import React from 'react';

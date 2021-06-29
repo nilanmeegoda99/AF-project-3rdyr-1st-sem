@@ -1,11 +1,7 @@
 import React, { Component } from 'react'
-
-import React, {Component} from 'react';
 import logo from "url:../../../public/images/logo.png";
 import AuthService from '../../services/AuthService';
 import { Link } from 'react-router-dom';
-import AuthService from '../../services/AuthService';
-
 class UserHeader extends Component {
 
     constructor(props){

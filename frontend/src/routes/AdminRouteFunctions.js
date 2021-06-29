@@ -1,12 +1,4 @@
-import React, { Component } from 'react'
-import { BrowserRouter as Router, Redirect, Route, Switch } from "react-router-dom";
-
-import AuthService from '../services/AuthService';
-
-import Footer from '../components/common/Footer';
-import AdminHeader from '../components/common/AdminHeader';
-import Dashboard from '../components/admin/Dashboard';
-import React, { Children, Component } from 'react'
+import React from 'react'
 import { BrowserRouter as Router, Redirect, Route, Switch } from "react-router-dom";
 import AuthService from '../services/AuthService'
 
