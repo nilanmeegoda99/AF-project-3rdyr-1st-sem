@@ -7,7 +7,9 @@ import userprofile from 'url:../../../../public/images/userprofile.png';
 import background2 from 'url:../../../../public/images/background2.jpg';
 import { Alert } from '@material-ui/lab';
 import DeleteIcon from '@material-ui/icons/Delete';
- 
+import AuthService from '../../../services/AuthService';
+import axios from 'axios';
+
 const styles = theme => ({
     root:{
         backgroundImage:"url("+background2+")",
@@ -47,12 +49,53 @@ const styles = theme => ({
 const initialState = {
     haveNotifications: false,
     notifications: [],
+    user: {},
+    notifications: [],
 };
 class ViewProfile extends Component {
 
     constructor(props){
         super(props);
         this.state = initialState;
+        this.deleteNotification = this.deleteNotification.bind(this);
+    }
+
+    deleteNotification(id){
+        axios.delete('http://localhost:5000/api/notifications/'+id)
+        .then(res => {
+            window.location.reload(false);
+        })
+        .catch(error => {
+            console.log(error)
+        })
+
+        this.setState({
+            user:userData,
+        })
+    }
+    
+    componentDidMount(){
+
+        const user = AuthService.getUserData();
+        const userData = user.userData;
+        const id = user.userData._id;
+
+        axios.get('http://localhost:5000/api/notifications/user/'+id)
+        .then(res => {
+            var data = res.data.notifications;
+
+            this.setState({
+                notifications: data,
+            })
+        })
+        .catch(error => {
+            console.log(error)
+        })
+
+        this.setState({
+            user:userData,
+        })
+
     }
 
     render() {
@@ -79,22 +122,19 @@ class ViewProfile extends Component {
 
                                     <Grid item xs={12} sm className={classes.cardItem}>
                                         <Typography variant="h6" >
-                                            <b>Name:</b> Amal Perera
+                                            <b>Name:</b> {this.state.user.name}
                                         </Typography>
                                         <Typography variant="h6" >
-                                            <b>Email:</b> abc@gmail.com
+                                            <b>Email:</b> {this.state.user.email }
                                         </Typography>
                                         <Typography variant="h6" >
-                                            <b>Contact.No:</b> 0111123123
+                                            <b>Contact.No:</b> {this.state.user.contact_no}
                                         </Typography>
                                         <Typography variant="h6" >
-                                            <b>Type:</b> User
+                                            <b>Type:</b> {this.state.user.user_type}
                                         </Typography>
                                         <Typography variant="h6" >
-                                            <b>Role:</b> Researcher
-                                        </Typography>
-                                        <Typography variant="h6" >
-                                            <b>Status</b> Active/Not
+                                            <b>Admin Role:</b> {this.state.user.isAdmin ? "Yes": "No"}
                                         </Typography>
                                         
                                     </Grid>
@@ -118,30 +158,35 @@ class ViewProfile extends Component {
 
                                 <Grid container alignItems="center" direction="column" justify="center">
 
-                                    { this.state.haveNotifications == false ? 
+                                    { this.state.notifications.length > 0 ?
                                         
+                                        this.notifications.map((item) => (
+                                            
                                         <Card className={classes.notificationCard}>
                                             <CardContent>
                                                 <Grid item xs={12} md={12} className={classes.cardItem}>
                                                     <Typography variant="h6" className="mt-1">
-                                                        <b>Title:</b> Submission of research paper
+                                                        <b>Title:</b> {item.title}
                                                     </Typography>
                                                     <Typography variant="h6" className="mt-1">
-                                                        <b>Message:</b> took a galley of type and scrambled it to make a t ype specimen book. 
+                                                        <b>Message:</b> {item.message} 
                                                     </Typography>
 
-                                                    <b>Received On:</b> 2020/02/02 10.00AM
+                                                    <b>Received On:</b> {item.date} &ensp; {item.time}
 
                                                     <Tooltip title="Delete Notification" arrow>
                                                         <Typography className="float-end my-2">
                                                             <DeleteIcon className={classes.deleteIcon} 
-                                                                onClick={()=> alert('Are you Sure?')}
+                                                                onClick={()=> this.deleteNotification(item._id) }
                                                             />
                                                         </Typography>
                                                     </Tooltip>
                                                 </Grid>
                                             </CardContent>
                                         </Card>
+                                        
+                                        ))
+
                                         :
                                         <Alert severity="info">You Don't Have Any Notifications</Alert>
                                     

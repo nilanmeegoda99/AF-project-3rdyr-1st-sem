@@ -15,7 +15,7 @@ class AdminHeader extends Component {
         }
 
         this.state.user = this.props.user;
-        console.log("Admin Header Data",this.props.user);
+        // console.log("Admin Header Data",this.props.user);
         
         this.redirectToLogin = this.redirectToLogin.bind(this);
         this.logoutUser = this.logoutUser.bind(this);

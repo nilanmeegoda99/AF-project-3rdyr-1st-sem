@@ -46,7 +46,7 @@ const createPayment = async(req, res) => {
 const getPaymentById = async(req, res) => {
 
     if(req.params.id && req.params){
-        await Payment.findById(req.params.id)
+        await Payment.findById(req.params.id).populate('user')
         .then( data => {
             res.status(200).send({ success: true, 'payment': data })
         })

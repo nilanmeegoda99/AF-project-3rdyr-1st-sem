@@ -590,6 +590,11 @@ class ResearchSingleView extends Component {
 
                                     <>
                                         <Typography variant="body1" className="mt-4">
+                                            <b>Payment</b>
+                                        </Typography>
+                                        <Link to={"/user/payment/"+this.state.research.payment} >View Payment</Link>
+
+                                        <Typography variant="body1" className="mt-4">
                                             <b>Change Completed Status</b>
                                         </Typography>
                                         <FormGroup row>

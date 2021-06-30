@@ -38,6 +38,27 @@ const getAllNotifications = async(req, res) => {
     } )
 }
 
+// @desc  Get All Notifications by USerID
+// @route GET /api/notifications/user/:id
+// @access Public Authorized User
+
+const getNotificationsByUserID = async(req, res) => {
+
+    if(req.params && req.params.id){
+        await Notification.find({ "user": req.params.id })
+        .then( data => {
+            res.status(200).send({ success: true, 'notifications': data })
+        })
+        .catch( (error) => {
+            res.status(500).send({ success: false, 'message': error })
+        } )
+    }
+    else{
+        res.status(200).send({ success: false, 'message': "No data found" })
+    }
+
+}
+
 
 // @desc  Delete Notification
 // @route Delete /api/notifications:id
@@ -63,4 +84,5 @@ export default{
     createNotification,
     getAllNotifications,
     deleteNotification,
+    getNotificationsByUserID,
 }

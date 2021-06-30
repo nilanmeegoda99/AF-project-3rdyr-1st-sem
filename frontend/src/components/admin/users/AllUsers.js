@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { Grid, Typography, Paper, Tooltip,
     Table, TableBody, TableCell, TableHead, TableRow, TableContainer
 } from '@material-ui/core';
- import { withStyles } from "@material-ui/core/styles";
- import Loader from '../../common/Loader';
- import EditIcon from '@material-ui/icons/Edit';
- import DeleteIcon from '@material-ui/icons/Delete';
- import CheckIcon from '@material-ui/icons/Check';
- import CloseIcon from '@material-ui/icons/Close';
+import { withStyles } from "@material-ui/core/styles";
+import Loader from '../../common/Loader';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
+import axios from 'axios';
 
 const styles = theme =>({
 
@@ -53,26 +54,7 @@ const initialState = {
     isLargeScreen: true,
     loading: false,
 
-    rows: [
-        {
-            title: "aghkhjbc gk hjkhj",
-            year: "2021/08/05",
-            venue: "ghkjk ghkhgk ghkk",
-            role: "ghkjk ghkhgk ghkk",
-        },
-        {
-            title: "uiouio oiuu oipop",
-            year: "2020/07/07",
-            venue: "rtyrty rtyty  tyrtyrt",
-            role: "rtyrty rtyty  tyrtyrt",
-        },
-        {
-            title: "abc acs asdsa",
-            year: "2019/06/15",
-            venue: "asdsa asdsad  sads",
-            role: "asdsa asdsad  sads",
-        },
-    ]
+    users: [],
     
 };
 
@@ -81,6 +63,22 @@ class AllUsers extends Component {
     constructor(props){
         super(props);
         this.state = initialState;
+    }
+
+    async componentDidMount(){
+
+        await axios.get('http://localhost:5000/api/users')
+        .then(res =>{
+            console.log(res);
+            this.setState({
+                users: res.data,
+            })
+
+        })
+        .catch(error => {
+            console.log("error", error)
+        })
+
     }
 
     render() {
@@ -108,19 +106,18 @@ class AllUsers extends Component {
                                         <TableCell className={classes.tableHeader} align="center">Contact Number</TableCell>
                                         <TableCell className={classes.tableHeader} align="center">Type</TableCell>
                                         <TableCell className={classes.tableHeader} align="center">Role</TableCell>
-                                        <TableCell className={classes.tableHeader} align="center">Status</TableCell>
                                     </TableRow>
                                 </TableHead>
 
                                 <TableBody>
-                                {this.state.rows.map((row) => (
-                                    <TableRow key={row.title} hover>
-                                        <TableCell className={classes.tableCell} >{row.title}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.year}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.year}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.venue}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.role}</TableCell>
-                                        <TableCell className={classes.tableCell} >Active/Not</TableCell>
+                                {this.state.users.map((row) => (
+                                    <TableRow key={row.title} hover key={row._id}>
+                                        <TableCell className={classes.tableCell} >{row.name}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.email}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.contact_no}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.user_type}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.isAdmin ? "Yes": "No"}
+                                        </TableCell>
                                         
                                         {/* <TableCell className={classes.tableCell} >
                                             <Tooltip title="Edit" arrow>

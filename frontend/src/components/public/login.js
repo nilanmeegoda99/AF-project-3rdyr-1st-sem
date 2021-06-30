@@ -51,67 +51,32 @@ class Login extends Component {
             loading: true,
         })
 
-        console.log(this.state);
+        // console.log(this.state);
         var messageRes = null;
         var variantRes = null;
 
-        // axios.post('http://', data)
-        // .then(res => {
-            var res={
-                status:200,
-                data:{
-                    success: true,
-                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlBBTUtBWUEiLCJpYXQiOjE1MTYyMzkwMjJ9.-H9NZ1JHZ4tO79UM80CmJ3dw3xj2vgsLkJpZ25bCzaw",
-                    message: "Data Success",
-                    data:{
-                        name:'kamal',
-                        email:'kamal@gmail.com',
-                        isAdmin: 
-                            // true,
-                            false,
-                        user_type: 
-                        // 'Super Admin'
-                        // 'Editor'
-                        // 'Reviewer'
-                        'Attendee'
-                        // 'Researcher'
-                        // 'Workshop Coordinator'
-                    }
-                }
-            }
-            if(res.status == 200){
-                if(res.data.success){
-                    var userData = res.data.data;
-                    var token = res.data.token;
+        axios.post('http://localhost:5000/api/users/login', this.state.formData)
+        .then(res => {
+            
+            // console.log(res);
+            var userData = res.data;
+            var token = res.data.token;
 
-                    messageRes = res.data.message;
-                    variantRes = "success";
-
-                    AuthService.setUserDataToLocal(userData, token);
-                    
-                    if(userData.isAdmin){
-                        window.location.href = '/admin';
-                    }
-                    else{
-                        window.location.href = '/';
-                    }
-
-                }
-                else{
-                    messageRes = res.data.message;
-                    variantRes = "error";
-                }
+            AuthService.setUserDataToLocal(userData, token);
+            
+            if(userData.isAdmin){
+                window.location.href = '/admin';
             }
             else{
-                messageRes = res.data.message;
-                variantRes = "error";
+                window.location.href = '/';
             }
-        // })
-        // .catch(error => {
-        //     console.log(error);
-        //     messageRes = error.message;
-        //     variantRes = "error";
-        // })
+
+        })
+        .catch(error => {
+            console.log(error);
+            messageRes = error.message;
+            variantRes = "error";
+        })
 
         setTimeout(() => {
             this.setState({

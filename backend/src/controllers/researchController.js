@@ -195,6 +195,57 @@ const completeResearch = async(req, res) => {
     }
 }
 
+// @desc  Complete Payment
+// @route Put /api/researches/paid/:id
+// @access Admin Reviewer
+
+const completePayment = async(req, res) => {
+
+    if(req.body && req.params){
+
+        const query = { "_id": req.params.id };
+        const update = { 
+            "is_Paid": true,
+            "payment": req.params.payment,
+         };
+        
+        await Research.updateOne( query , update)
+        .then( result => {
+            // console.log(result.modifiedCount);
+            res.status(200).send({ success: true, 'message': "Research Payment Updated Successfully!" })
+        })
+        .catch( (error) => {
+            res.status(500).send({ success: false, 'message': error })
+        } )
+
+    }else{
+        res.status(200).send({ success: false, 'message': "No Data Found" })
+    }
+}
+
+
+// @desc  Get researches fro public
+// @route get /api/researches/public/
+// @access Admin Reviewer
+
+const getResearchesForPublic = async(req, res) => {
+
+    if(req.body && req.params){
+
+        await Research.find({ "conference": req.params.id ,"completed": true })
+        .then( data => {
+            // console.log(result.modifiedCount);
+            res.status(200).send({ success: true, 'researches': data })
+        })
+        .catch( (error) => {
+            res.status(500).send({ success: false, 'message': error })
+        } )
+
+    }else{
+        res.status(200).send({ success: false, 'message': "No Data Found" })
+    }
+}
+
 export default{
     createResearch,
     getAllResearches,
@@ -203,5 +254,7 @@ export default{
     deleteResearchDetails,
     approveResearch,
     getAllResearchesByUser,
-    completeResearch
+    completeResearch,
+    completePayment,
+    getResearchesForPublic,
 }

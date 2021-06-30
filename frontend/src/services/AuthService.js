@@ -3,7 +3,7 @@ import axios from 'axios';
  class AuthService{
 
     validateJWTToken = () => {
-        console.log('Validate JWT');
+        // console.log('Validate JWT');
         var result = this.loginWithJWTToken();
 
         if(result){
@@ -27,41 +27,41 @@ import axios from 'axios';
             
             // axios.post('',token)
             // .then(res => {
-                var res = {
-                    status:200,
-                    data:{
-                        success: true,
-                        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlBBTUtBWUEiLCJpYXQiOjE1MTYyMzkwMjJ9.-H9NZ1JHZ4tO79UM80CmJ3dw3xj2vgsLkJpZ25bCzaw",
-                        message: "Data Success",
-                        data:{
-                            name:'kamal',
-                            email:'kamal@gmail.com',
-                            id: "60d90867e53d7b1b0c2eb933",
-                            isAdmin: 
-                                // true,
-                                false,
-                            user_type: 
-                            // 'Super Admin'
-                            // 'Editor'
-                            // 'Reviewer'
-                            'Attendee'
-                            // 'Researcher'
-                            // 'Workshop Coordinator'
-                        }
-                    }
-                }
+                // var res = {
+                //     status:200,
+                //     data:{
+                //         success: true,
+                //         token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlBBTUtBWUEiLCJpYXQiOjE1MTYyMzkwMjJ9.-H9NZ1JHZ4tO79UM80CmJ3dw3xj2vgsLkJpZ25bCzaw",
+                //         message: "Data Success",
+                //         data:{
+                //             name:'kamal',
+                //             email:'kamal@gmail.com',
+                //             id: "60d90867e53d7b1b0c2eb933",
+                //             isAdmin: 
+                //                 true,
+                //                 // false,
+                //             user_type: 
+                //             // 'Super Admin'
+                //             // 'Editor'
+                //             'Reviewer'
+                //             // 'Attendee'
+                //             // 'Researcher'
+                //             // 'Workshop Coordinator'
+                //         }
+                //     }
+                // }
 
                 //token expired
-                if(res.data.message == "Expired"){
-                    this.userLogout();
-                    return null;
-                }
-                else{ 
-                    //token not expired set data agin to prevent local storage changes
-                    user = res.data.data;
-                    var token = res.data.token;
-                    this.setUserDataToLocal(user, token);
-                }
+                // if(res.data.message == "Expired"){
+                //     this.userLogout();
+                //     return null;
+                // }
+                // else{ 
+                //     //token not expired set data agin to prevent local storage changes
+                //     user = res.data.data;
+                //     var token = res.data.token;
+                //     this.setUserDataToLocal(user, token);
+                // }
             // })
             // .catch(error => {
             //     console.log('Error',error);

@@ -106,42 +106,46 @@ class CreatePayment extends Component {
         }
         else{
             
-        //     var messageRes = null;
-        //     var variantRes = null;
-        //     var dialogBoxRes = true;
+            var messageRes = null;
+            var variantRes = null;
+            var dialogBoxRes = true;
+
+            var data = {
+                payment: payid,
+            };
     
-        //     axios.post('http://localhost:5000/api/payments', this.state.formData)
-        //     .then(res => {
-        //         console.log(res);
-        //         if(res.status == 201){
-        //             if(res.data.success){
-        //                 messageRes = res.data.message;
-        //                 variantRes = "success";
-        //             }
-        //             else{
-        //                 messageRes = res.data.message;
-        //                 variantRes = "error";
-        //             }
-        //         }
-        //         else{
-        //             messageRes = res.data.message;
-        //             variantRes = "error";
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.log(error);
-        //         messageRes = error.message;
-        //         variantRes = "error";
-        //     })
+            axios.put('http://localhost:5000/api/researches/paid/'+this.state.id , data)
+            .then(res => {
+                console.log(res);
+                if(res.status == 201){
+                    if(res.data.success){
+                        messageRes = res.data.message;
+                        variantRes = "success";
+                    }
+                    else{
+                        messageRes = res.data.message;
+                        variantRes = "error";
+                    }
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                messageRes = error.message;
+                variantRes = "error";
+            })
     
-        //    setTimeout(() => {
-        //         this.setState({
-        //             dialogBox: dialogBoxRes,
-        //             message: messageRes,
-        //             variant: variantRes,
-        //             loading: false,
-        //         })
-        //    },2000)
+           setTimeout(() => {
+                this.setState({
+                    dialogBox: dialogBoxRes,
+                    message: messageRes,
+                    variant: variantRes,
+                    loading: false,
+                })
+           },2000)
 
         }
 
@@ -217,7 +221,7 @@ class CreatePayment extends Component {
             dialogBox: false,
         })
 
-        // window.location.href = "/attendee/my";
+        window.location.href = "/attendee/my";
     }
 
     setSelectedValue = (name, value) => {

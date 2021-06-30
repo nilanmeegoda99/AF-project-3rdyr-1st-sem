@@ -14,5 +14,7 @@ router.route('/:id').get(researchController.getResearchByID)
 router.route('/approve/:id').put(researchController.approveResearch)
 router.route('/user/:id').get(researchController.getAllResearchesByUser)
 router.route('/complete/:id').put(researchController.completeResearch)
+router.route('/paid/:id').put(researchController.completePayment)
+router.route('/public/:id').get(researchController.getResearchesForPublic)
 
 export default router;

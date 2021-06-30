@@ -14,6 +14,7 @@ import AuthService from '../../../services/AuthService';
 import fileIcon1 from 'url:../../../../public/images/fileIcon1.png';
 import { Alert } from '@material-ui/lab';
 import axios from 'axios';
+import CreatePayment from '../Payment/CreatePayment';
 
 const styles = theme =>({
 
@@ -293,29 +294,6 @@ class ViewResearch extends Component {
                                     />
                                 }
 
-                                { this.state.research.completed == false && 
-                                    this.state.research.is_Paid == false &&
-                                    this.state.approved &&
-                                    <Grid item xs={12} md={12}>
-                                        <div style={{ 
-                                            marginBottom: 20, 
-                                            marginTop: 20, 
-                                            padding:10, 
-                                            position: 'relative', 
-                                            float: 'right' }}>
-                                            
-                                            <Link to={"/researches/pay/"}>
-                                                <button
-                                                    type="button" 
-                                                    className="btn btn-outline-primary"
-                                                >
-                                                    Make Payment
-                                                </button>
-                                            </Link>
-                                        </div>
-                                    </Grid>
-                                }
-
                                 <Grid item xs={12} md={12}>
                                     <div style={{ 
                                         marginBottom: 20, 
@@ -338,6 +316,21 @@ class ViewResearch extends Component {
                             </CardContent>                            
                         </Card>
                     </Grid>
+
+                    {
+                        this.state.research.completed == false && 
+                        this.state.research.is_Paid == false &&
+                        this.state.approved &&
+
+                        <Grid item xs={12} md={12}>
+                            <Card className={classes.detailsCard}>
+                                <CardContent>
+                                    <CreatePayment paymentDetails={this.state.research}/>
+                                </CardContent>                            
+                            </Card>
+                        </Grid>
+                    }
+
                     {
                      this.state.message != '' &&   
                         <Snackbar open={this.state.snackbar}  autoHideDuration={2500} onClose={this.closeSnackBar} name="snackBar">

@@ -9,5 +9,6 @@ router.route('/').post(downloadableController.createMaterial)
 
 router.route('/:id').delete(downloadableController.deleteMaterial)
 router.route('/:id').get(downloadableController.getMaterialById)
+router.route('/conference/:id').get(downloadableController.getMaterialByConferenceId)
 
 export default router;

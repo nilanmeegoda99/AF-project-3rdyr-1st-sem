@@ -150,30 +150,14 @@ class ViewBooked extends Component {
                                     
                                 <br />
                                 <br />
-                                <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Payment</b>: { this.state.booking.payment == null ? "None": this.state.booking.payment  }
-                                </Typography>
 
-                                { this.state.booking.isPaid == false &&
+                                { this.state.booking.isPaid && 
 
-                                    <Grid item xs={12} md={12}>
-                                        <div style={{ 
-                                            marginBottom: 20, 
-                                            marginTop: 20, 
-                                            padding:10, 
-                                            position: 'relative', 
-                                            float: 'right' }}>
-                                            
-                                            {/* <Link to={"/user/payment/create"} > */}
-                                                <button
-                                                    type="button" 
-                                                    className="btn btn-outline-primary"
-                                                >
-                                                    Complete Payment
-                                                </button>
-                                            {/* </Link> */}
-                                        </div>
-                                    </Grid>
+                                    <Typography variant="body1" className={classes.detailsRow}>
+                                        <Link to={"/user/payment/"+this.state.booking.payment}>
+                                            View Payment
+                                        </Link>
+                                    </Typography>
                                 }
 
                             </CardContent>                            

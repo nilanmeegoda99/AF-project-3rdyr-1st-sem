@@ -166,6 +166,29 @@ const getAllWorkshopsByUser = async(req, res) => {
     }
 }
 
+
+// @desc  Get workshops fro public
+// @route get /api/workshops/public/:id
+// @access Admin Reviewer
+
+const getWorkshopsForPublic = async(req, res) => {
+
+    if(req.body && req.params){
+
+        await Workshop.find({ "conference": req.params.id ,"is_Approved": true })
+        .then( data => {
+            // console.log(result.modifiedCount);
+            res.status(200).send({ success: true, 'workshops': data })
+        })
+        .catch( (error) => {
+            res.status(500).send({ success: false, 'message': error })
+        } )
+
+    }else{
+        res.status(200).send({ success: false, 'message': "No Data Found" })
+    }
+}
+
 export default{
     createWorkshop,
     getAllWorkshops,
@@ -174,4 +197,5 @@ export default{
     deleteWorkshopDetails,
     approveWorkshop,
     getAllWorkshopsByUser,
+    getWorkshopsForPublic,
 }

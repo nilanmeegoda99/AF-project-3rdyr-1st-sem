@@ -8,5 +8,6 @@ router.route('/').post(notificationController.createNotification)
                  .get(notificationController.getAllNotifications)
 
 router.route('/:id').delete(notificationController.deleteNotification)
+router.route('/user/:id').get(notificationController.getNotificationsByUserID)
 
 export default router;

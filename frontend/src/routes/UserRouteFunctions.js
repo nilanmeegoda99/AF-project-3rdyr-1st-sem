@@ -30,7 +30,8 @@ function UserCommonRoutes({ component: ProComponent, ...rest}){
                 render={
                     (props) => (  userDetails.user_type === "Researcher" || 
                                     userDetails.user_type === "Workshop Coordinator" ||
-                                    userDetails.user_type === "Attendee"
+                                    userDetails.user_type === "Attendee" ||
+                                    userDetails.user_type === "Reviewer"
                                 )?
                         <ProComponent {...props} />
                     :

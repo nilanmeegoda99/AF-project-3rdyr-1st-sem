@@ -59,35 +59,26 @@ class Register extends Component {
         var messageRes = null;
         var variantRes = null;
 
-        // axios.post('http://', data)
-        // .then(res => {
-            var res={
-                status:200,
-                data:{
-                    success: true,
-                    message: "Data Success"
-                }
-            }
-            if(res.status == 200){
-                if(res.data.success){
-                    messageRes = res.data.message;
-                    variantRes = "success";
-                }
-                else{
-                    messageRes = res.data.message;
-                    variantRes = "danger";
-                }
+        axios.post('http://localhost:5000/api/users', this.state.formData)
+        .then(res => {
+            if(res.status == 201){
+                messageRes = "Successfully Registered!";
+                variantRes = "success";
+
+                setTimeout(() => {
+                    window.location.href = "/session/login";
+                }, 2000)
             }
             else{
-                messageRes = res.data.message;
-                variantRes = "danger";
+                messageRes = "Error";
+                variantRes = "error";
             }
-        // })
-        // .catch(error => {
-        //     console.log(error);
-        //     messageRes = error.message;
-        //     variantRes = "danger";
-        // })
+        })
+        .catch(error => {
+            console.log(error);
+            messageRes = error.message;
+            variantRes = "error";
+        })
 
         setTimeout(() => {
             this.setState({

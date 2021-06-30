@@ -13,5 +13,6 @@ router.route('/:id').get(workshopController.getWorkshopByID)
 
 router.route('/approve/:id').put(workshopController.approveWorkshop)
 router.route('/user/:id').get(workshopController.getAllWorkshopsByUser)
+router.route('/public/:id').get(workshopController.getWorkshopsForPublic)
 
 export default router;

@@ -79,9 +79,31 @@ const deleteMaterial = async(req, res) => {
     }
 }
 
+
+// @desc  Get Material by conference id
+// @route GET /api/materials/conference:id
+// @access Public Authorized User
+
+const getMaterialByConferenceId = async(req, res) => {
+
+    if(req.params && req.params.id){
+        await Download_Material.find( { "conference": req.params.id } )
+        .then( data => {
+            res.status(200).send({ success: true, 'materials': data })
+        })
+        .catch( (error) => {
+            res.status(500).send({ success: false, 'message': error })
+        } )
+    }
+    else{
+        res.status(200).send({ success: false, 'error': "Id not found" })
+    }
+}
+
 export default{
     createMaterial,
     getAllMaterials,
     getMaterialById,
     deleteMaterial,
+    getMaterialByConferenceId,
 }
