@@ -20,14 +20,25 @@
     "react-test-renderer": "^17.0.2"
   },
   "dependencies": {
+    "@babel/preset-env": "^7.14.7",
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.58",
     "axios": "^0.21.1",
+    "bootstrap-icons": "^1.5.0",
+    "identity-obj-proxy": "^3.0.0",
+    "prop-types": "^15.7.2",
     "react": "^17.0.2",
+    "react-bootstrap-icons": "^1.5.0",
     "react-dom": "^17.0.2",
     "react-material-ui-form-validator": "^2.1.4",
-    "react-router-dom": "^5.2.0",
-    "@babel/preset-env": "^7.14.7"
+    "react-native-countdown-component": "^2.7.1",
+    "react-router-dom": "^5.2.0"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/__mocks__/fileMock.js",
+      "\\.(css|less)$": "identity-obj-proxy"
+    }
   }
 }

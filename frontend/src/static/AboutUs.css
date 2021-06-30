@@ -1,0 +1,59 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+.head-color {
+  background-color: black;
+  padding: 75px;
+  z-index: 500;
+}
+
+.div-logo {
+  float: left;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+}
+
+.div-topic {
+  color: white;
+}
+
+.about-us-text {
+  width: 60%;
+  margin: 0 auto;
+  padding: 50px;
+  background-color: #c8c8c8;
+  z-index: 1000;
+  border-radius: 3px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  position: relative;
+  top: -50px;
+}
+
+.contactUs-Button {
+  padding: 10px 20px 10px 20px;
+  color: black;
+  margin-top: 30px;
+  background-color: black;
+  color: white;
+  border-radius: 3px;
+  border: none;
+}
+
+.mainText {
+  font-size: 28px;
+}
+
+.secondaryText {
+  text-align: justify;
+  font-size: 20px;
+  margin-top: 30px;
+}
+
+.contactUs {
+  margin: 20px 0px 0px 0px;
+  display: block;
+}
