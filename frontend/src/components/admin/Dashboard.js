@@ -1,35 +1,179 @@
 import React, { Component } from 'react'
+import {
+    Grid, Typography, Card, CardContent, Button,Snackbar,
+}
+    from '@material-ui/core';
+import { withStyles } from "@material-ui/core/styles";
+import axios from 'axios';
+import { Alert } from '@material-ui/lab';
 
-export default class Dashboard extends Component {
+const styles = theme =>({
+
+    detailsCard:{
+        margin: 10,
+        padding: 20,
+        backgroundColor: '#FBFBFB',
+    },
+    detailsRow:{
+        marginBottom: 10,
+    }
+
+});
+
+const initialState = {
+
+    loading: false,
+    conference: {},
+    message: '',
+    variant: '',
+    id:'',
+    events: [],
+    snackbar: false,
+
+};
+class Dashboard extends Component {
+
+    constructor(props){
+        super(props);
+        this.state = initialState;
+    }
+
+    closeSnackBar = (event, response) => {
+        this.setState({
+            snackbar: false,
+        })
+    }
+
+    async componentDidMount(){
+
+        var conferenceOne;
+        var messageRes = '';
+        var variantRes = '';
+        var eventsArr = [];
+        var cID = null;
+        var snackbarRes = true;
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/conferences/active')
+            .then(res => {
+                console.log(res);
+                if(res.data.conference != null){
+                    if(res.data.success){
+                        snackbarRes = false;
+                        conferenceOne = res.data.conference;
+                        cID = conferenceOne._id;
+                    }
+                    else{
+                        messageRes = res.data.message;
+                        variantRes = "error";
+                    }
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            })
+            .catch(error => {
+                console.log("Error:",error)
+                variantRes = "error";
+                messageRes = "Error";
+            })
+
+        if(cID != null){
+            //get events from db
+            await axios.get('http://localhost:5000/api/events/conference/'+cID)
+                .then(res => {
+                    console.log(res);
+                    if(res.data.events != null){
+                        if(res.data.success){
+                            snackbarRes = false;
+                            eventsArr = res.data.events;
+                        }
+                        else{
+                            messageRes = res.data.message;
+                            variantRes = "error";
+                        }
+                    }
+                    else{
+                        messageRes = res.data.message;
+                        variantRes = "error";
+                    }
+                })
+                .catch(error => {
+                    console.log("Error:",error)
+                    variantRes = "error";
+                    messageRes = "Error";
+                })
+        }
+
+        this.setState({
+            message: messageRes,
+            conference: conferenceOne,
+            variant: variantRes,
+            snackbar: snackbarRes,
+            id: cID,
+            events: eventsArr,
+        })
+
+        // console.log(this.state);
+
+    }
+
     render() {
+
+        const { classes } = this.props;
+
         return (
             <div>
-                Admin Dashboard
-                <p>
+                <Grid container alignItems="center" justify="center" direction="column">
 
-                    What is Lorem Ipsum?
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                    { this.state.conference ?
+                        <Grid item xs={12} md={12}>
+                            <Card className={classes.detailsCard}>
+                                <CardContent>
+                                    <Typography variant="h4" >ACTIVE CONFERENCE :
+                                        {( this.state.conference.title+ "").toUpperCase() }</Typography>
+                                    <hr />
+                                    <Typography variant="body1" className={classes.detailsRow}>
+                                        <b>Start Date</b>: { this.state.conference.startDate }
+                                    </Typography>
 
-                    Why do we use it?
-                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+                                    <Typography variant="body1" className={classes.detailsRow}>
+                                        <b>End Date</b>: { this.state.conference.endDate }
+                                    </Typography>
 
+                                    <Typography variant="body1" className={classes.detailsRow}>
+                                        <b>Description</b>: { this.state.conference.description }
+                                    </Typography>
 
-                    Where does it come from?
-                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+                                    <Typography variant="body1" className={classes.detailsRow}>
+                                        <b>Venue</b>: { this.state.conference.venue }
+                                    </Typography>
 
-                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+                                    <div>
+                                        <hr />
 
-                    Where can I get some?
-                    There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.
-                
-                    What is Lorem Ipsum?
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        :
+                        <Grid item xs={12} md={12}>
+                            <Alert severity="Error">No Active conferences. Please Active a conference.</Alert>
+                        </Grid>
+                    }
 
-                    Why do we use it?
-                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+                    { this.state.message != '' &&
+                    <Snackbar open={this.state.snackbar}  autoHideDuration={2500} onClose={this.closeSnackBar} name="snackBar">
+                        <Alert severity={this.state.variant} onClose={this.closeSnackBar} >{this.state.message}</Alert>
+                    </Snackbar>
+                    }
 
-                </p>
+                </Grid>
             </div>
         )
     }
 }
+
+export default withStyles(styles)(Dashboard);
+

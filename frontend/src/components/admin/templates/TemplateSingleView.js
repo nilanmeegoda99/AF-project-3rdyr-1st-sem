@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {
     Grid, Typography, Card, CardContent, Button, Chip, Snackbar,
-    Switch, FormControlLabel, FormGroup, Alert, CardMedia, Tooltip,
+    Switch, FormControlLabel, FormGroup, CardMedia, Tooltip,
 }
 from '@material-ui/core';
 import { Link } from 'react-router-dom';
