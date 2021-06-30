@@ -1,8 +1,28 @@
 import React, {Component} from 'react';
-import { Container, Form, Button, Row, Col, Alert } from 'react-bootstrap';
-import { userTypes } from '../../utils/Constants';
+import axios from 'axios';
+import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import Loader from '../common/Loader';
-// import Select from 'react-select';
+import { Button, Grid, Typography } from '@material-ui/core'
+import { withStyles } from "@material-ui/core/styles";
+import { Autocomplete, Alert} from '@material-ui/lab';
+import { userTypes } from '../../utils/Constants';
+
+const styles = theme =>({
+
+    inputElement:{
+        paddingLeft: 10,
+        paddingRight: 10,
+        minWidth: '360px',
+    },
+    linkText:{
+        textDecoration: 'none',
+        '&:hover':{
+            textDecoration: 'underline',
+            color: '#DDC545'
+        },
+    },
+
+});
 
 const initialState = {
     formData: {
@@ -22,12 +42,13 @@ class Register extends Component {
     constructor(props){
         super(props);
         this.state = initialState;
-        this.fromSubmit = this.fromSubmit.bind(this);
+        this.formSubmit = this.formSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleSelection = this.handleSelection.bind(this);
+        this.setSelectedValue = this.setSelectedValue.bind(this);
     }
 
-    fromSubmit(e){
+    formSubmit(e){
         e.preventDefault();
 
         this.setState({
@@ -38,41 +59,32 @@ class Register extends Component {
         var messageRes = null;
         var variantRes = null;
 
-        // axios.post('http://', data)
-        // .then(res => {
-            var res={
-                status:200,
-                data:{
-                    success: true,
-                    message: "Data Success"
-                }
-            }
-            if(res.status == 200){
-                if(res.data.success){
-                    messageRes = res.data.message;
-                    variantRes = "success";
-                }
-                else{
-                    messageRes = res.data.message;
-                    variantRes = "danger";
-                }
+        axios.post('http://localhost:5000/api/users', this.state.formData)
+        .then(res => {
+            if(res.status == 201){
+                messageRes = "Successfully Registered!";
+                variantRes = "success";
+
+                setTimeout(() => {
+                    window.location.href = "/session/login";
+                }, 2000)
             }
             else{
-                messageRes = res.data.message;
-                variantRes = "danger";
+                messageRes = "Error";
+                variantRes = "error";
             }
-        // })
-        // .catch(error => {
-        //     console.log(error);
-        //     messageRes = error.message;
-        //     variantRes = "danger";
-        // })
+        })
+        .catch(error => {
+            console.log(error);
+            messageRes = error.message;
+            variantRes = "error";
+        })
 
         setTimeout(() => {
             this.setState({
                 message: messageRes,
                 variant: variantRes,
-                loading: false,  
+                loading: false,
             })
         }, 2000);
 
@@ -88,7 +100,7 @@ class Register extends Component {
         this.setState({
             formData: data,
         })
-        console.log(this.state);
+        // console.log(this.state);
     }
 
     handleSelection = (e) => {
@@ -101,102 +113,165 @@ class Register extends Component {
         this.setState({
             formData: data,
         })
-        console.log(this.state);
+        // console.log(this.state);
+    }
+
+    setSelectedValue = (name, value) => {
+
+        var data = this.state.formData;
+        data[name] = value;
+
+        this.setState({
+            formData: data,
+        })
+
+        // console.log(this.state);
+
     }
 
     render() {
+
+        const { classes } = this.props;
+
         return (
-            <div>
-                <Container className='py-3'>
-                    
-                <h1 className="text-center mt-3">User Registration</h1>
+            <div className= 'py-3'>
 
-                {/* Loading */}
-                {
-                    this.state.loading && <Loader />
-                }
+                <div>
 
-                <Row className="justify-content-md-center mt-3">
-                    <Col xs={12} md={6}>
+                    <h1 className="mt-3 text-center">User Registration</h1>
 
-                        <Form onSubmit={this.fromSubmit}>
+                    {/* Loading */}
+                    {
+                        this.state.loading && <Loader />
+                    }
+
+                    <ValidatorForm onSubmit={this.formSubmit}>
+
+                        <Grid container alignItems="center" justify="center" direction="column">
+
+                            <Grid item xs={12} md={12} className={classes.inputElement}>
+                                <TextValidator
+                                    className="mt-5"
+                                    placeholder="Name"
+                                    helperText="Enter Name"
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    type="name"
+                                    name="name"
+                                    value={this.state.formData.name}
+                                    onChange={(e) => this.handleChange(e)} 
+                                    validators={['required']}
+                                    errorMessages={['This field is required']}
+                                />
+                            </Grid>
                             
-                            <Form.Group className="mb-3">
-                                <Form.Label>Name</Form.Label>
-                                    <Form.Control 
-                                        type="text" 
-                                        placeholder="Enter Name"
-                                        name="name"
-                                        value={this.state.formData.name}
-                                        onChange={(e) => this.handleChange(e)} 
-                                        required/>
+                            <Grid item xs={12} md={12} className={classes.inputElement}>
+                                <TextValidator
+                                    className="mt-4"
+                                    placeholder="Email"
+                                    helperText="Enter Email"
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    type="email"
+                                    name="email"
+                                    value={this.state.formData.email}
+                                    onChange={(e) => this.handleChange(e)} 
+                                    validators={['required', 'isEmail']}
+                                    errorMessages={['This field is required', 'Email is not valid']}
+                                />
+                            </Grid>
 
-                                    <Form.Text className="text-muted">
-                                </Form.Text>
-                            </Form.Group>
+                            <Grid item xs={12} md={12} className={classes.inputElement}>
+                                <TextValidator
+                                    className="mt-4"
+                                    placeholder="Contact Number"
+                                    helperText="Enter Contact Number"
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    type="text"
+                                    name="contact_no"
+                                    value={this.state.formData.contact_no}
+                                    onChange={(e) => this.handleChange(e)} 
+                                    validators={["required", "matchRegexp:^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$"]}
+                                    errorMessages={["Phone Number is required!","Please enter valid Phone Number(Eg:0772345678)"]}
+                                />
+                            </Grid>
 
-                            <Form.Group className="mb-3">
-                                <Form.Label>Email Address</Form.Label>
-                                    <Form.Control 
-                                        type="email" 
-                                        placeholder="Enter Email"
-                                        name="email"
-                                        value={this.state.formData.email}
-                                        onChange={(e) => this.handleChange(e)} 
-                                        required/>
-
-                                    <Form.Text className="text-muted">
-                                </Form.Text>
-                            </Form.Group>
-
-                            <Form.Group className="mb-3">
-                                <Form.Label>Contact Number</Form.Label>
-                                    <Form.Control 
-                                        type="text" 
-                                        placeholder="Enter Contact Number"
-                                        name="contact_no"
-                                        value={this.state.formData.contact_no}
-                                        onChange={(e) => this.handleChange(e)} 
-                                        required/>
-
-                                    <Form.Text className="text-muted">
-                                </Form.Text>
-                            </Form.Group>
+                            <Grid item xs={12} md={12} className={classes.inputElement}>
+                                <Autocomplete
+                                        className="mt-4"
+                                        fullWidth
+                                        options={userTypes}
+                                        getOptionLabel={(opt) => opt.value}
+                                        name="user_type"
+                                        size='small'
+                                        // value={{value: this.state.formData.user_type}}
+                                        onChange={(e,v) => this.setSelectedValue("user_type", v == null ? null : v.value) }
+                                        renderInput={(params) =><TextValidator {...params} variant="outlined"
+                                            placeholder="Select User Type"
+                                            helperText="Select User Type"
+                                            value={this.state.formData.user_type == '' ? '' : this.state.formData.user_type}
+                                            validators={["required"]}
+                                            errorMessages={["User Type is required!"]}
+                                        /> }
+                                    />
+                            </Grid>
                             
-                            <Form.Group className="mb-3" controlId="formBasicPassword">
-                                <Form.Label>Password</Form.Label>
-                                <Form.Control 
-                                    type="password" 
+                            <Grid item xs={12} md={12} className={classes.inputElement}>
+                                <TextValidator
+                                    className="mt-4"
                                     placeholder="Password"
+                                    helperText="Enter Password"
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    type="password"
                                     name="password"
                                     value={this.state.formData.password}
-                                    onChange={(e) => this.handleChange(e)}  
-                                    required />
-                            </Form.Group>
+                                    onChange={(e) => this.handleChange(e)} 
+                                    validators={['required']}
+                                    errorMessages={['This field is required']}
+                                />
+                            </Grid>
 
-                            <a href="/login">Already have an Account ?</a>
+                            <Grid item xs={12} md={12} className={classes.inputElement}>
+                                <div className="float-end mb-4">
+                                    <a href="/login" className={classes.linkText}>Already have an Account ?</a>
+                                </div>
+                            </Grid>
 
                             {
                                 this.state.message != '' &&
-                                <Alert variant={this.state.variant}>
-                                    {this.state.message}
-                                </Alert>
+
+                                <Grid item xs={12} md={12} >
+                                    <Alert severity={this.state.variant} style={{ maxWidth:'360px'}}>
+                                        <Typography>
+                                            {this.state.message}
+                                        </Typography>
+                                    </Alert>
+                                </Grid>
                             }
                         
-                            <div className="text-center">
-                                <Button variant="primary" type="submit">
-                                    REGISTER
-                                </Button>
-                            </div>
+                            <Grid item xs={12} md={12}>
+                                <div className="text-center my-3">
+                                    <Button variant="contained" color="primary" type="submit">
+                                        REGISTER
+                                    </Button>
+                                </div>
+                            </Grid>
 
-                        </Form>
-                    </Col>
-                </Row>
+                        </Grid>
 
-                </Container>
+                    </ValidatorForm>
+
+                </div>
+
             </div>
         );
     }
 }
 
-export default Register;
+export default withStyles(styles)(Register);

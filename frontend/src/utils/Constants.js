@@ -2,16 +2,29 @@
 export const userTypes = [
     {
         key: 1,
-        value: 'attendee',
-        label: 'Attendee'
+        value: 'Attendee'
+    },
+    {
+        key: 2,
+        value: 'Researcher',
+    },
+    {
+        key: 3,
+        value: 'Workshop Coordinator',
+    },
+];
+
+export const adminUserTypes = [
+    {
+        key: 1,
+        value: 'Super Admin'
 
     },{
         key: 2,
-        value: 'researcher',
-        label: 'Researcher',
+        value: 'Reviewer',
     },{
         key: 3,
-        value: 'workshop_coordinator',
-        label: 'Workshop Coordinator',
+        value: 'Editor',
     },
 ];
+

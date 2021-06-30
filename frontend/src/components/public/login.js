@@ -1,7 +1,28 @@
 import React, {Component} from 'react';
-import { Container, Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import axios from 'axios';
+import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import Loader from '../common/Loader';
+import { Button, Grid, Typography } from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert';
+import { withStyles } from "@material-ui/core/styles";
+import AuthService from '../../services/AuthService';
+
+const styles = theme =>({
+
+    inputElement:{
+        paddingLeft: 10,
+        paddingRight: 10,
+        minWidth: '360px',
+    },
+    linkText:{
+        textDecoration: 'none',
+        '&:hover':{
+            textDecoration: 'underline',
+            color: '#DDC545'
+        },
+    },
+
+});
 
 const initialState = {
     formData: {
@@ -12,54 +33,49 @@ const initialState = {
     message: '',
     loading: false,
 };
+
+
 class Login extends Component {
 
     constructor(props){
         super(props);
         this.state = initialState;
-        this.fromSubmit = this.fromSubmit.bind(this);
+        this.formSubmit = this.formSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
 
-    fromSubmit(e){
+    formSubmit(e){
         e.preventDefault();
 
         this.setState({
             loading: true,
         })
 
-        console.log(this.state);
+        // console.log(this.state);
         var messageRes = null;
         var variantRes = null;
 
-        axios.post('http://', data)
+        axios.post('http://localhost:5000/api/users/login', this.state.formData)
         .then(res => {
-            // var res={
-            //     status:200,
-            //     data:{
-            //         success: true,
-            //         message: "Data Success"
-            //     }
-            // }
-            if(res.status == 200){
-                if(res.data.success){
-                    messageRes = res.data.message;
-                    variantRes = "success";
-                }
-                else{
-                    messageRes = res.data.message;
-                    variantRes = "danger";
-                }
+            
+            // console.log(res);
+            var userData = res.data;
+            var token = res.data.token;
+
+            AuthService.setUserDataToLocal(userData, token);
+            
+            if(userData.isAdmin){
+                window.location.href = '/admin';
             }
             else{
-                messageRes = res.data.message;
-                variantRes = "danger";
+                window.location.href = '/';
             }
+
         })
         .catch(error => {
             console.log(error);
             messageRes = error.message;
-            variantRes = "danger";
+            variantRes = "error";
         })
 
         setTimeout(() => {
@@ -86,68 +102,95 @@ class Login extends Component {
     }
 
     render() {
+
+        const { classes } = this.props;
+
         return (
-            <div>
-                <Container className='py-3'>
-                    
-                <h1 className="text-center mt-3">User Login</h1>
+        
+            <div className= 'py-3'>
 
-                {/* Loading */}
-                {
-                    this.state.loading && <Loader />
-                }
+                <div>
 
-                <Row className="justify-content-md-center mt-3">
-                    <Col xs={12} md={6}>
-                        <Form onSubmit={this.fromSubmit}>
-                            <Form.Group className="mb-3" controlId="formBasicEmail">
-                                <Form.Label>Email Address</Form.Label>
-                                    <Form.Control 
-                                        type="email" 
-                                        placeholder="Enter Email"
-                                        name="email"
-                                        value={this.state.formData.email}
-                                        onChange={(e) => this.handleChange(e)} 
-                                        required/>
+                    <h1 className="my-3 text-center">User Login</h1>
 
-                                    <Form.Text className="text-muted">
-                                </Form.Text>
-                            </Form.Group>
+                    {/* Loading */}
+                    {
+                        this.state.loading && <Loader />
+                    }
 
-                            <Form.Group className="mb-3" controlId="formBasicPassword">
-                                <Form.Label>Password</Form.Label>
-                                <Form.Control 
-                                    type="password" 
+                    <ValidatorForm onSubmit={this.formSubmit}>
+
+                        <Grid container alignItems="center" justify="center" direction="column">
+
+                            <Grid item xs={12} md={12} className={classes.inputElement}>
+                                <TextValidator
+                                    className="mt-5"
+                                    placeholder="Email"
+                                    helperText="Enter Email"
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    type="email"
+                                    name="email"
+                                    value={this.state.formData.email}
+                                    onChange={(e) => this.handleChange(e)} 
+                                    validators={['required', 'isEmail']}
+                                    errorMessages={['This field is required', 'Email is not valid']}
+                                />
+                            </Grid>
+                            
+                            <Grid item xs={12} md={12} className={classes.inputElement}>
+                                <TextValidator
+                                    className="mt-4"
                                     placeholder="Password"
+                                    helperText="Enter Password"
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    type="password"
                                     name="password"
                                     value={this.state.formData.password}
-                                    onChange={(e) => this.handleChange(e)}  
-                                    required />
-                            </Form.Group>
+                                    onChange={(e) => this.handleChange(e)} 
+                                    validators={['required']}
+                                    errorMessages={['This field is required']}
+                                />
+                            </Grid>
 
-                            <a href="/register">Create New Account ?</a>
+                            <Grid item xs={12} md={12} className={classes.inputElement}>
+                                <div className="float-end mb-4">
+                                    <a href="/register" className={classes.linkText}>Create New Account ?</a>
+                                </div>
+                            </Grid>
 
                             {
                                 this.state.message != '' &&
-                                <Alert variant={this.state.variant}>
-                                    {this.state.message}
-                                </Alert>
+
+                                <Grid item xs={12} md={12} >
+                                    <Alert severity={this.state.variant} style={{ maxWidth:'360px'}}>
+                                        <Typography>
+                                            {this.state.message}
+                                        </Typography>
+                                    </Alert>
+                                </Grid>
                             }
                         
-                            <div className="text-center">
-                                <Button variant="primary" type="submit">
-                                    LOGIN
-                                </Button>
-                            </div>
+                            <Grid item xs={12} md={12}>
+                                <div className="text-center my-3">
+                                    <Button variant="contained" color="primary" type="submit">
+                                        LOGIN
+                                    </Button>
+                                </div>
+                            </Grid>
 
-                        </Form>
-                    </Col>
-                </Row>
+                        </Grid>
 
-                </Container>
+                    </ValidatorForm>
+
+                </div>
+
             </div>
         );
     }
 }
 
-export default Login;
+export default withStyles(styles)(Login);

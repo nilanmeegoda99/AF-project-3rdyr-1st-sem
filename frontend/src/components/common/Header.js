@@ -1,38 +1,36 @@
 import React, {Component} from 'react';
-import { Navbar, Nav, NavDropdown, } from "react-bootstrap";
+
+import AuthService from '../../services/AuthService';
+
+import AdminHeader from './AdminHeader';
+import UserHeader from './UserHeader';
 
 class Header extends Component {
+
+    constructor(props){
+        super(props);
+        this.state = {
+            user:{
+                authorized: false,
+                isAdmin: false,
+                user_type: null,
+            }
+        }
+        this.state.user = this.props.user;
+        // console.log("Header data", this.props)
+    }
+
     render() {
         return (
-            <Navbar bg="dark" variant="dark" expand="lg" fixed="top" >
-                <Navbar.Brand href="/">ICAF</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="ml-auto">
-                        <Nav.Link href="/">Home</Nav.Link>
-                        <Nav.Link href="/keynotes">Keynotes</Nav.Link>
-                        <Nav.Link href="/about">AboutUs</Nav.Link>
-                        <NavDropdown title="For Researchers" id="basic-nav-dropdown">
-                            <NavDropdown.Item href="/action">Action</NavDropdown.Item>
-                            <NavDropdown.Item href="/action">Another action</NavDropdown.Item>
-                            <NavDropdown.Item href="/action">Something</NavDropdown.Item>
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item href="/action">Separated link</NavDropdown.Item>
-                        </NavDropdown>
-                        <NavDropdown title="For Workshop" id="basic-nav-dropdown">
-                            <NavDropdown.Item href="/action">Action</NavDropdown.Item>
-                            <NavDropdown.Item href="/action">Another action</NavDropdown.Item>
-                            <NavDropdown.Item href="/action">Something</NavDropdown.Item>
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item href="/action">Separated link</NavDropdown.Item>
-                        </NavDropdown>
-                        <NavDropdown title="Profile" id="basic-nav-dropdown">
-                            <NavDropdown.Item href="/login">Login</NavDropdown.Item>
-                            <NavDropdown.Item href="/register">Register</NavDropdown.Item>
-                        </NavDropdown>
-                    </Nav>
-                </Navbar.Collapse>
-            </Navbar>
+            <>
+                {   
+                    this.state.user.isAdmin == false ?
+
+                    <UserHeader user={this.state.user}/>
+                    :
+                    <AdminHeader user={this.state.user}/>
+                }
+            </>
         );
     }
 }
