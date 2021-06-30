@@ -29,13 +29,33 @@ const createMaterial = async(req, res) => {
 
 const getAllMaterials = async(req, res) => {
 
-    await Download_Material.find({})
+    await Download_Material.find({}).populate('conference')
     .then( data => {
         res.status(200).send({ success: true, 'materials': data })
     })
     .catch( (error) => {
         res.status(500).send({ success: false, 'message': error })
     } )
+}
+
+// @desc  Get Material by Id
+// @route GET /api/materials/:id
+// @access Public Authorized User
+
+const getMaterialById = async(req, res) => {
+
+    if(req.params && req.params.id){
+        await Download_Material.findById(req.params.id).populate('conference')
+        .then( data => {
+            res.status(200).send({ success: true, 'material': data })
+        })
+        .catch( (error) => {
+            res.status(500).send({ success: false, 'message': error })
+        } )
+    }
+    else{
+        res.status(200).send({ success: false, 'error': "Id not found" })
+    }
 }
 
 
@@ -49,7 +69,7 @@ const deleteMaterial = async(req, res) => {
         
         await Download_Material.deleteOne( {"_id":req.params.id} )
         .then( result => {
-            res.status(201).send({ success: true, 'message': "Material Deleted Successfully!" })
+            res.status(200).send({ success: true, 'message': "Material Deleted Successfully!" })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -62,5 +82,6 @@ const deleteMaterial = async(req, res) => {
 export default{
     createMaterial,
     getAllMaterials,
+    getMaterialById,
     deleteMaterial,
 }

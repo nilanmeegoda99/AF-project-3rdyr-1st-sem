@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Grid, Typography, Paper, Tooltip,
+import { Grid, Typography, Paper, Tooltip, Snackbar,
     Table, TableBody, TableCell, TableHead, TableRow, TableContainer
 } from '@material-ui/core';
 import { withStyles } from "@material-ui/core/styles";
@@ -10,6 +10,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import AuthService from '../../../services/AuthService';
+import { Alert } from '@material-ui/lab';
+import axios from 'axios';
 
 const styles = theme =>({
 
@@ -58,22 +60,12 @@ const initialState = {
     loading: false,
 
     adminRole: '',
+    
+    snackbar: false,
+    variant: '',
+    message: '',
 
-    rows: [
-        {
-            title: "aghkhjbc gk hjkhj",
-            year: "2021/08/05",
-            year: "2021/08/05",
-            venue: "ghkjk ghkhgk ghkk",
-        },
-        {
-            title: "uiouio oiuu oipop",
-            year: "2020/07/07",
-            year: "2020/07/07",
-            venue: "rtyrty rtyty tyrtyrt",
-        },
-
-    ]
+    bookings: []
     
 };
 
@@ -82,18 +74,104 @@ class BookedConferences extends Component {
     constructor(props){
         super(props);
         this.state = initialState;
+        this.closeSnackBar = this.closeSnackBar.bind(this);
+        this.deleteBooking = this.deleteBooking.bind(this);
     }
+
+    closeSnackBar = (event, response) => {
+        this.setState({
+            snackbar: false,
+        })
+    }
+
+    deleteBooking(id){
+        var result = confirm("Are Sure You Want to delete?");
+
+        if(result){
+            var messageRes = '';
+            var variantRes = '';
+            var snackbarRes = true;
     
-    componentDidMount(){
+            axios.delete('http://localhost:5000/api/bookings/'+id)
+            .then(res => {
+                console.log(res);
+                if(res.status == 200){
+                    if(res.data.success){
+                        snackbarRes = false;
+                        window.location.reload(false);
+                    }
+                    else{
+                        messageRes = res.data.message;
+                        variantRes = "error";
+                    }
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            })
+            .catch(error => {
+                console.log("Error:",error);
+                variantRes = "error";
+                messageRes = error;
+            })
+            
+            this.setState({
+                message: messageRes,
+                variant: variantRes,
+                snackbar: snackbarRes,
+            })
+        }
+
+    }
+
+    async componentDidMount(){
 
         var localStorageData = AuthService.getUserData();
         // console.log("User Data",localStorageData);
 
         var role = localStorageData.userData.user_type;
+        var id = localStorageData.userData.id;
+
+        var messageRes = '';
+        var variantRes = '';
+        var snackbarRes = true;
+        var bookingArr = [];
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/bookings/user/'+id)
+        .then(res => {
+            console.log(res);
+            
+            if(res.status == 200){
+                if(res.data.success){
+                    snackbarRes = false;
+                    bookingArr = res.data.bookings;
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
 
         this.setState({
+            message: messageRes,
+            bookings: bookingArr,
+            variant: variantRes,
+            snackbar: snackbarRes,
             adminRole: role,
-        });
+        })
+
     }
 
     render() {
@@ -112,7 +190,7 @@ class BookedConferences extends Component {
                     <Grid item xs={12} md={12}>
                         <div style={{ marginBottom: 20, padding:10, position: 'relative', float: 'right' }}>
                             
-                            <Link to="/attendee/conference/create">
+                            <Link to="/attendee/booking/create">
                                 <button
                                     type="button" 
                                     className="btn btn-outline-primary"
@@ -131,25 +209,29 @@ class BookedConferences extends Component {
                                     <TableRow className={classes.tableHeaderRow}>
                                         <TableCell className={classes.tableHeader} align="center">Conference</TableCell>
                                         <TableCell className={classes.tableHeader} align="center">Date</TableCell>
-                                        <TableCell className={classes.tableHeader} align="center">Details</TableCell>
+                                        <TableCell className={classes.tableHeader} align="center">Payment</TableCell>
+                                        <TableCell className={classes.tableHeader} align="center">Status</TableCell>
                                         <TableCell className={classes.tableHeader} align="center">Actions</TableCell>
                                     </TableRow>
                                 </TableHead>
 
                                 <TableBody>
-                                {this.state.rows.map((row) => (
-                                    <TableRow key={row.title} hover>
-                                        <TableCell className={classes.tableCell} >{row.title}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.venue}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.venue}</TableCell>
+                                {this.state.bookings.map((row) => (
+                                    <TableRow key={row._id} hover>
+                                        <TableCell className={classes.tableCell} >{row.conference.title}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.date}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.isPaid ? "Yes":"No"}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.status}</TableCell>
                                         <TableCell className={classes.tableCell} >
                                             <Tooltip title="View" arrow>
-                                                <Link to="/attendee/conference/1">
+                                                <Link to={"/attendee/booking/"+row._id}>
                                                     <EditIcon className={classes.editButtonIcon}></EditIcon>
                                                 </Link>
                                             </Tooltip>
-                                            <Tooltip title="Cancel" arrow>
-                                                <DeleteIcon className={classes.deleteButtonIcon}></DeleteIcon>
+                                            <Tooltip title="Delete" arrow>
+                                                <DeleteIcon className={classes.deleteButtonIcon}
+                                                    onClick={() => this.deleteBooking(row._id)}
+                                                ></DeleteIcon>
                                             </Tooltip>
                                         </TableCell>
                                     </TableRow>
@@ -159,7 +241,12 @@ class BookedConferences extends Component {
                         </TableContainer>
 
                     </Grid>
-
+                    {
+                     this.state.message != '' &&   
+                        <Snackbar open={this.state.snackbar}  autoHideDuration={2500} onClose={this.closeSnackBar} name="snackBar">
+                            <Alert severity={this.state.variant} onClose={this.closeSnackBar} >{this.state.message}</Alert>
+                        </Snackbar>
+                    }
                 </Grid>
             </div>
         )

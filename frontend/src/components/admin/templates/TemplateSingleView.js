@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import {
-    Grid, Typography, Card, CardContent, Button, Chip, 
+    Grid, Typography, Card, CardContent, Button, Chip, Snackbar,
     Switch, FormControlLabel, FormGroup, Alert, CardMedia, Tooltip,
 }
 from '@material-ui/core';
@@ -12,6 +12,8 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 import AuthService from '../../../services/AuthService';
 import fileIcon1 from 'url:../../../../public/images/fileIcon1.png';
+import { Alert } from '@material-ui/lab';
+import axios from 'axios';
 
 const styles = theme =>({
 
@@ -47,6 +49,8 @@ const styles = theme =>({
 const initialState = {
     adminRole: '',
     showAttachments: false,
+    material: {},
+    cTitle: '',
 }
 
 class TemplateSingleView extends Component {
@@ -57,7 +61,6 @@ class TemplateSingleView extends Component {
         this.showContent = this.showContent.bind(this);
         this.openAttachment = this.openAttachment.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.formSubmit = this.formSubmit.bind(this);
     }
 
     showContent = (name) => {
@@ -90,11 +93,6 @@ class TemplateSingleView extends Component {
         }
 
     }
-
-    formSubmit(e){
-
-    }
-
     
     handleChange = (e) => {
         var name = e.target.name;
@@ -109,20 +107,60 @@ class TemplateSingleView extends Component {
         // console.log(this.state);
     }
 
-    openAttachment(){
-        window.open(fileIcon1, '_blank');
+    openAttachment(attachment){
+        window.open("http://localhost:5000/"+attachment , '_blank');
     }
 
-    componentDidMount(){
+    async componentDidMount(){
 
         var localStorageData = AuthService.getUserData();
         // console.log("User Data",localStorageData);
 
         var role = localStorageData.userData.user_type;
 
+        var id = this.props.match.params.id;
+
+        var messageRes = '';
+        var variantRes = '';
+        var title = '';
+        var snackbarRes = true;
+        var materialOne = {};
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/materials/'+id)
+        .then(res => {
+            console.log(res);
+            
+            if(res.status == 200){
+                if(res.data.success){
+                    snackbarRes = false;
+                    materialOne = res.data.material;
+                    title = materialOne.conference.title;
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
+        
         this.setState({
             adminRole: role,
-        });
+            message: messageRes,
+            material: materialOne,
+            variant: variantRes,
+            snackbar: snackbarRes,
+            cTitle: title,
+        })
     }
 
     render() {
@@ -136,18 +174,16 @@ class TemplateSingleView extends Component {
                     <Grid item xs={12} md={12}>
                         <Card className={classes.detailsCard}>
                             <CardContent>
-                                <Typography variant="h4" >USER TEMPLATE</Typography>
-                                <Typography variant="h4" >CONFERENCE : Title</Typography>
+                                <Typography variant="h4" className="text-center"><u>USER TEMPLATE</u></Typography>
+                                <Typography variant="h4" >CONFERENCE : {( this.state.cTitle+ "").toUpperCase() }
+                                </Typography>
                                 <hr />
                                 <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Type</b>: Workshop
+                                    <b>Type</b>: { this.state.material.type }
                                 </Typography>
 
                                 <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Description</b>: Contrary to popular belief, Lorem Ipsum is not simply random text. 
-                                    It has roots in a piece of classical Latin literature from 45 BC, making it over 
-                                    2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in 
-                                    Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem 
+                                    <b>Description</b>: { this.state.material.description }
                                 </Typography>
 
                                 <Typography variant="body1" className="mt-4">
@@ -174,7 +210,7 @@ class TemplateSingleView extends Component {
                                             <CardMedia
                                                 component="img"
                                                 image={fileIcon1}
-                                                onClick={ this.openAttachment }
+                                                onClick={ () => this.openAttachment(this.state.material.attachment) }
                                             />
                                         </Card>
                                     </Tooltip>

@@ -13,4 +13,6 @@ router.route('/:id').get(eventController.getEventByID)
 
 router.route('/approve/:id').put(eventController.approveEvent)
 
+router.route('/conference/:id').get(eventController.getEventsByConference)
+
 export default router;

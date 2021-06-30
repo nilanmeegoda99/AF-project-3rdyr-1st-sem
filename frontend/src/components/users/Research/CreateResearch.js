@@ -10,6 +10,8 @@ import { Alert } from '@material-ui/lab';
 import Loader from '../../common/Loader';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import researchImage from 'url:../../../../public/images/researchImage.jpg';
+import AuthService from '../../../services/AuthService';
+import axios from 'axios';
 
 const styles = theme =>({
 
@@ -38,17 +40,12 @@ const initialState = {
     formData: {
         title: '',
         description: '',
-        attachments: [],
+        attachment: [],
         conference: '',
-        created_by: '',
+        user: '',
     },
-    conferences: [
-        {
-            key: 1,
-            value: 'Sample Conference'
-    
-        },
-    ],
+    attachments: [],
+    conferences: [],
     
 };
 class CreateResearch extends Component {
@@ -62,6 +59,46 @@ class CreateResearch extends Component {
         this.setSelectedValue = this.setSelectedValue.bind(this); 
         this.handleFileUpload = this.handleFileUpload.bind(this); 
         this.closeSnackBar = this.closeSnackBar.bind(this); 
+        this.loadData = this.loadData.bind(this); 
+        this.uploadData = this.uploadData.bind(this); 
+
+    }
+
+    uploadData(){
+        console.log(this.state);
+        var messageRes = null;
+        var variantRes = null;
+        var dialogBoxRes = false;
+        var snackBarres = true;
+
+        axios.post('http://localhost:5000/api/researches', this.state.formData)
+        .then(res => {
+            if(res.status == 201){
+                messageRes = res.data.message;
+                variantRes = "success";
+                dialogBoxRes = true;
+                snackBarres = false;
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            messageRes = error.message;
+            variantRes = "error";
+        })
+
+        setTimeout(() => {
+            this.setState({
+                message: messageRes,
+                variant: variantRes,
+                loading: false,
+                snackbar: snackBarres,
+                dialogBox: dialogBoxRes,
+            })
+        }, 2000);
 
     }
 
@@ -75,47 +112,52 @@ class CreateResearch extends Component {
         console.log(this.state);
         var messageRes = null;
         var variantRes = null;
-        var dialogBoxRes = true;
+        var fileUrl = '';
+        var snackbarRes = true;
+        var form_data = this.state.formData;
 
-        // axios.post('http://', data)
-        // .then(res => {
-            var res={
-                status:200,
-                data:{
-                    success: true,
-                    message: "Data Success",
-                }
-            }
+        var data = new FormData();
+        data.append("attachment",this.state.attachments[0]);
+
+        axios.post('http://localhost:5000/api/files/uploadFile', data)
+        .then(res => {
             if(res.status == 200){
-                if(res.data.success){
-                    messageRes = res.data.message;
-                    variantRes = "success";
-                }
-                else{
-                    messageRes = res.data.message;
-                    variantRes = "error";
-                }
+                console.log(res);
+                fileUrl = res.data.path.replace(/\\/g, "/");
+                // console.log("FIle:",fileUrl);
+                
+                messageRes = "File Upload Success";
+                variantRes = "success";
+                snackbarRes = false;
+                form_data['attachment'] = fileUrl;
+
+                this.setState({
+                    formData: form_data,
+                })
+
+                this.uploadData();
+
             }
             else{
                 messageRes = res.data.message;
                 variantRes = "error";
             }
-        // })
-        // .catch(error => {
-        //     console.log(error);
-        //     messageRes = error.message;
-        //     variantRes = "error";
-        //     dialogBox: dialogBoxRes,
-        // })
+        })
+        .catch(error => {
+            console.log(error);
+            messageRes = error.message;
+            variantRes = "error";
+        })
 
-        setTimeout(() => {
+        setTimeout( () => {
             this.setState({
                 message: messageRes,
                 variant: variantRes,
                 loading: false,
-                dialogBox: dialogBoxRes,
+                snackbar: snackbarRes,
             })
-        }, 2000);
+        }, 2000)
+
 
     }
 
@@ -190,11 +232,10 @@ class CreateResearch extends Component {
         }
         
         var no_files = 0;
-        data['attachments'] = files;
         no_files = files.length;
 
         this.setState({
-            formData: data,
+            attachments: files,
             noOfFiles: no_files,
         })
 
@@ -208,7 +249,42 @@ class CreateResearch extends Component {
         })
     }
 
+    async loadData(){
+        
+        var user = AuthService.getUserData();
+        var id = user.userData.id;
+        var conferenceOne;
+        var conferenceArr = [];
+        var data = this.state.formData;
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/conferences/active')
+        .then(res => {
+            console.log(res);
+            if(res.status == 200){
+                if(res.data.success){
+                    conferenceOne = res.data.conference;
+                    conferenceArr.push(conferenceOne);
+                }
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+        })
+
+        data['user'] = id;
+
+        this.setState({
+            conferences: conferenceArr,
+            formData:data,
+        })
+        // console.log(this.state)
+    }
+
     componentDidMount(){
+
+        //load data
+        this.loadData();
 
         if(window.innerWidth < 960){
             this.setState({
@@ -302,11 +378,11 @@ class CreateResearch extends Component {
                                         className="mt-4 mb-3"
                                         fullWidth
                                         options={this.state.conferences}
-                                        getOptionLabel={(opt) => opt.value}
+                                        getOptionLabel={(opt) => opt.title}
                                         name="conference"
                                         size='small'
                                         // value={{value: this.state.formData.conference}}
-                                        onChange={(e,v) => this.setSelectedValue("conference", v == null ? null : v.value) }
+                                        onChange={(e,v) => this.setSelectedValue("conference", v == null ? null : v._id) }
                                         renderInput={(params) =><TextValidator {...params} variant="outlined"
                                             placeholder="Select Conference"
                                             helperText="Select Conference"

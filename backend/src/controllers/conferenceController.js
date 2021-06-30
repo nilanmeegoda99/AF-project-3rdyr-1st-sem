@@ -79,7 +79,7 @@ const updateConferenceDetails = async(req, res) => {
         await Conference.updateOne( query , update)
         .then( result => {
             // console.log(result.modifiedCount);
-            res.status(201).send({ success: true, 'message': "Conference Updated Successfully!" })
+            res.status(200).send({ success: true, 'message': "Conference Updated Successfully!" })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -100,7 +100,7 @@ const deleteConferenceDetails = async(req, res) => {
         
         await Conference.deleteOne( {"_id":req.params.id} )
         .then( result => {
-            res.status(201).send({ success: true, 'message': "Conference Deleted Successfully!" })
+            res.status(200).send({ success: true, 'message': "Conference Deleted Successfully!" })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -110,10 +110,55 @@ const deleteConferenceDetails = async(req, res) => {
     }
 }
 
+// @desc  Active Conference
+// @route POST /api/conferences/approve/:id
+// @access Admin Super Admin
+
+const activeConference = async(req, res) => {
+
+    if(req.body && req.params){
+
+        const query = { "_id": req.params.id };
+        const update = { 
+            "active": req.body.active,
+         };
+        
+        await Conference.update( query , update)
+        .then( result => {
+            // console.log(result.modifiedCount);
+            res.status(200).send({ success: true })
+        })
+        .catch( (error) => {
+            res.status(500).send({ success: false, 'message': error })
+        } )
+
+    }else{
+        res.status(200).send({ success: false, 'message': "No Data Found" })
+    }
+}
+
+// @desc  Get Active Conference
+// @route GET /api/conferences/active
+// @access Admin Super Admin
+
+const getActiveConference = async(req, res) => {
+
+    await Conference.findOne({ "active": true })
+    .then( data => {
+        res.status(200).send({ success: true, 'conference': data })
+    })
+    .catch( (error) => {
+        res.status(500).send({ success: false, 'message': error })
+    } )
+ 
+}
+
 export default{
     createConference,
     getAllConferences,
     getConferenceByID,
     updateConferenceDetails,
     deleteConferenceDetails,
+    activeConference,
+    getActiveConference,
 }

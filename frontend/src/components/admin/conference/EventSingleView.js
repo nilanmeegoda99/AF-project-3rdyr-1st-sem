@@ -1,15 +1,16 @@
 import React, { Component } from 'react'
 import {
     Grid, Typography, Card, CardContent, Button, Chip, 
-    Switch, FormControlLabel, FormGroup,
+    Switch, FormControlLabel, FormGroup, Snackbar,
 }
 from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { withStyles } from "@material-ui/core/styles";
-
+import axios from 'axios';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 import AuthService from '../../../services/AuthService';
+import { Alert } from '@material-ui/lab';
 
 const styles = theme =>({
 
@@ -27,6 +28,13 @@ const styles = theme =>({
 const initialState = {
     adminRole: '',
     approved:false,
+    snackbar: false,
+    message: '',
+    variant:'',
+    approved: false,
+    id:'',
+    conferenceTitle: '',
+    event:{},
 }
 
 class EventSingleView extends Component {
@@ -37,9 +45,11 @@ class EventSingleView extends Component {
         this.setApproveStatus = this.setApproveStatus.bind(this);
     }
 
-    setApproveStatus(){
+    async setApproveStatus(){
 
         var approved_status = this.state.approved;
+        var messageRes = '';
+        var variantRes = '';
 
         if(approved_status){
             approved_status = false;
@@ -48,22 +58,106 @@ class EventSingleView extends Component {
             approved_status = true;
         }
 
+        var data = {
+            is_Approved: approved_status,
+        }
+
+        await axios.put('http://localhost:5000/api/events/approve/'+this.state.id, data)
+        .then(res => {
+            console.log(res);
+            if(res.status == 200){
+                if(res.data.success){
+                    variantRes = "success";
+                    messageRes = "Approve Status Changed";
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
+
         this.setState({
-            approved:approved_status
+            approved:approved_status,
+            message: messageRes,
+            variant: variantRes,
+            snackbar: true,
         })
 
     }
 
-    componentDidMount(){
+    closeSnackBar = (event, response) => {
+        this.setState({
+            snackbar: false,
+        })
+    }
+
+    async componentDidMount(){
 
         var localStorageData = AuthService.getUserData();
         // console.log("User Data",localStorageData);
 
         var role = localStorageData.userData.user_type;
 
+        var eventsOne = {};
+        var messageRes = '';
+        var variantRes = '';
+        var snackbarRes = true;
+        var conference_Title = '';
+        var approvedState = false;
+
+        var eId = this.props.match.params.id;
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/events/'+eId)
+        .then(res => {
+            console.log(res);
+            if(res.status == 200){
+                if(res.data.success){
+                    variantRes = "success";
+                    eventsOne = res.data.event;
+                    snackbarRes = false;
+                    conference_Title = eventsOne.conference.title;
+                    approvedState = eventsOne.is_Approved;
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
+
         this.setState({
             adminRole: role,
+            message: messageRes,
+            event: eventsOne,
+            variant: variantRes,
+            snackbar: snackbarRes,
+            id: eId,
+            conferenceTitle:conference_Title,
+            approved: approvedState,
         });
+
+        // console.log(this.state);
+        
     }
 
     render() {
@@ -77,28 +171,26 @@ class EventSingleView extends Component {
                     <Grid item xs={12} md={12}>
                         <Card className={classes.detailsCard}>
                             <CardContent>
-                                <Typography variant="h4" >EVENT : Title</Typography>
-                                <Typography variant="h4" >CONFERENCE : Title</Typography>
+                                <Typography variant="h4" >EVENT :
+                                {( this.state.event.title+ "").toUpperCase() }</Typography>
+                                
+                                <Typography variant="h4" >CONFERENCE :
+                                {( this.state.conferenceTitle+ "").toUpperCase() }</Typography>
                                 <hr />
                                 <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Start Date</b>: 2020/01/01
+                                    <b>Start Date</b>: {this.state.event.startDate}
                                 </Typography>
 
                                 <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>End Date</b>: 2020/01/01
+                                    <b>End Date</b>: {this.state.event.endDate}
                                 </Typography>
 
                                 <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Description</b>: Contrary to popular belief, Lorem Ipsum is not simply random text. 
-                                    It has roots in a piece of classical Latin literature from 45 BC, making it over 
-                                    2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in 
-                                    Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem 
+                                    <b>Description</b>: {this.state.event.description}
                                 </Typography>
 
                                 <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Other Details</b>: Sponsor Contrary to popular belief, Lorem Ipsum is not simply random text. 
-                                    It has roots in a piece of classical Latin literature from 45 BC, making it over 
-                                    2000 years old.
+                                    <b>Other Details</b>: {this.state.event.otherDetails}
                                 </Typography>
                                 
                                 <b>Status</b>: &ensp;
@@ -147,7 +239,7 @@ class EventSingleView extends Component {
                                 { 
                                     this.state.adminRole == 'Editor' &&
                                     
-                                    <Link to="/admin/events/edit/1">
+                                    <Link to={"/admin/events/edit/"+this.state.id}>
                                         <Button 
                                             className="mt-3 float-end"
                                             // onClick={() => window.location.href = "/admin/conferences/edit/1"}
@@ -162,6 +254,12 @@ class EventSingleView extends Component {
                             </CardContent>                            
                         </Card>
                     </Grid>
+
+                    { this.state.message != '' &&
+                        <Snackbar open={this.state.snackbar}  autoHideDuration={2500} onClose={this.closeSnackBar} name="snackBar">
+                            <Alert severity={this.state.variant} onClose={this.closeSnackBar} >{this.state.message}</Alert>
+                        </Snackbar>
+                    }
 
                 </Grid>
             </div>

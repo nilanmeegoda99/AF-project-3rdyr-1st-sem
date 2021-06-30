@@ -34,17 +34,19 @@ const initialState = {
     loading: false,
     dialogBox: false,
     snackbar: false,
-    noOfFiles: 0,
+    
+    allDetails: {},
 
     formData: {
-        date: '',
-        conference: '',
-        user: '',
+        details: '',
+        type: '',
+        amount: 0,
+        user:'',
     },
-    conferences: [],
+    id: '',
     
 };
-class CreateBookConference extends Component {
+class CreatePayment extends Component {
 
     constructor(props){
         super(props);
@@ -52,7 +54,97 @@ class CreateBookConference extends Component {
         this.fromSubmit = this.fromSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleDialogBoxButton = this.handleDialogBoxButton.bind(this); 
-        this.setSelectedValue = this.setSelectedValue.bind(this); 
+        this.setSelectedValue = this.setSelectedValue.bind(this);
+        this.updateOtherDetails = this.updateOtherDetails.bind(this);
+    }
+
+    updateOtherDetails(payid){
+
+        if(this.state.formData.type === "Booking"){
+
+            var messageRes = null;
+            var variantRes = null;
+            var dialogBoxRes = true;
+
+            var data = {
+                payment: payid,
+            };
+    
+            axios.put('http://localhost:5000/api/bookings/paid/'+this.state.id , data)
+            .then(res => {
+                console.log(res);
+                if(res.status == 201){
+                    if(res.data.success){
+                        messageRes = res.data.message;
+                        variantRes = "success";
+                    }
+                    else{
+                        messageRes = res.data.message;
+                        variantRes = "error";
+                    }
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                messageRes = error.message;
+                variantRes = "error";
+            })
+    
+           setTimeout(() => {
+                this.setState({
+                    dialogBox: dialogBoxRes,
+                    message: messageRes,
+                    variant: variantRes,
+                    loading: false,
+                })
+           },2000)
+
+        }
+        else{
+            
+        //     var messageRes = null;
+        //     var variantRes = null;
+        //     var dialogBoxRes = true;
+    
+        //     axios.post('http://localhost:5000/api/payments', this.state.formData)
+        //     .then(res => {
+        //         console.log(res);
+        //         if(res.status == 201){
+        //             if(res.data.success){
+        //                 messageRes = res.data.message;
+        //                 variantRes = "success";
+        //             }
+        //             else{
+        //                 messageRes = res.data.message;
+        //                 variantRes = "error";
+        //             }
+        //         }
+        //         else{
+        //             messageRes = res.data.message;
+        //             variantRes = "error";
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.log(error);
+        //         messageRes = error.message;
+        //         variantRes = "error";
+        //     })
+    
+        //    setTimeout(() => {
+        //         this.setState({
+        //             dialogBox: dialogBoxRes,
+        //             message: messageRes,
+        //             variant: variantRes,
+        //             loading: false,
+        //         })
+        //    },2000)
+
+        }
+
     }
 
     fromSubmit(e){
@@ -62,18 +154,24 @@ class CreateBookConference extends Component {
             loading: true,
         })
 
-        console.log(this.state);
+        // console.log(this.state.formData);
         var messageRes = null;
         var variantRes = null;
         var dialogBoxRes = true;
 
-        axios.post('http://localhost:5000/api/bookings', this.state.formData)
+        axios.post('http://localhost:5000/api/payments', this.state.formData)
         .then(res => {
             console.log(res);
             if(res.status == 201){
                 if(res.data.success){
                     messageRes = res.data.message;
                     variantRes = "success";
+                    var dialogBoxRes = false;
+
+                    var data = res.data.paymentDetails;
+                    var id = data._id;
+
+                    this.updateOtherDetails(id);
                 }
                 else{
                     messageRes = res.data.message;
@@ -119,7 +217,7 @@ class CreateBookConference extends Component {
             dialogBox: false,
         })
 
-        window.location.href = "/attendee/my";
+        // window.location.href = "/attendee/my";
     }
 
     setSelectedValue = (name, value) => {
@@ -131,44 +229,46 @@ class CreateBookConference extends Component {
             formData: data,
         })
 
-        // console.log(this.state);
+        console.log(this.state);
 
     }
 
-    async loadData(){
+    loadData(){
 
-        var user = AuthService.getUserData();
-        var userID = user.userData.id;
-        var conferenceOne;
-        var conferenceArr = [];
+        var details = this.props.paymentDetails;
+        var d_type = '';
+        var amount = 0;
+        var typeRefName = null;
         var data = this.state.formData;
+        console.log(details)
 
-        //get data from db
-        await axios.get('http://localhost:5000/api/conferences/active')
-        .then(res => {
-            console.log(res);
-            if(res.status == 200){
-                if(res.data.success){
-                    conferenceOne = res.data.conference;
-                    conferenceArr.push(conferenceOne);
-                }
-            }
-        })
-        .catch(error => {
-            console.log("Error:",error)
-        })
+        if(details.token != null){
+            d_type = "Booking";
+            amount = 1000;
+            typeRefName = 'booking';
+        }
+        else{
+            d_type = "Research";
+            amount = 3000;
+            typeRefName = 'research';
+        }
+        
+        data['type'] = d_type;
+        data['amount'] = amount;
+        data['user'] = details.user._id;
 
-        data['user'] = userID;
+        data[typeRefName] = details._id;
 
         this.setState({
-            conferences: conferenceArr,
             formData: data,
+            allDetails: details,
+            id: details._id,
         })
+
     }
 
     componentDidMount(){
 
-        //load data from db
         this.loadData();
 
         if(window.innerWidth < 960){
@@ -198,18 +298,12 @@ class CreateBookConference extends Component {
 
         return (
             <div>
-                <Grid container>
+                <Grid container alignItems="center" justify="center" direction="column">
 
-                    { this.state.isLargeScreen && 
-                        <Grid item xs={12} md={6}>
-                            <img src={attendeeImage} alt="" width="100%" height="550"/>
-                        </Grid>
-                    }
-
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={12}>
                         
                         <Typography variant="h4" className="pt-5 text-center">
-                            Create Booking
+                            Make Payment
                         </Typography>
 
                         {/* Loading */}
@@ -223,36 +317,52 @@ class CreateBookConference extends Component {
                             <Grid container className={classes.formGrid}>
 
                                 <Grid item xs={12} md={12} className={classes.inputElement}>
-                                    <Autocomplete
-                                        className="mt-4 mb-3"
+                                    <TextValidator
+                                        className="mt-4"
+                                        placeholder="Description"
+                                        helperText="Enter Details About Payment"
+                                        variant="outlined"
+                                        size="small"
                                         fullWidth
-                                        options={this.state.conferences}
-                                        getOptionLabel={(opt) => opt.title}
-                                        name="conference"
-                                        size='small'
-                                        // value={{value: this.state.formData.conference}}
-                                        onChange={(e,v) => this.setSelectedValue("conference", v == null ? null : v._id) }
-                                        renderInput={(params) =><TextValidator {...params} variant="outlined"
-                                            placeholder="Select Conference"
-                                            helperText="Select Conference"
-                                            value={this.state.formData.conference == '' ? '' : this.state.formData.conference}
-                                            validators={["required"]}
-                                            errorMessages={["User Type is required!"]}
-                                        /> }
+                                        type="text"
+                                        name="details"
+                                        value={this.state.formData.details}
+                                        onChange={(e) => this.handleChange(e)} 
+                                        validators={['required']}
+                                        errorMessages={['This field is required']}
                                     />
                                 </Grid>
 
                                 <Grid item xs={12} md={12} className={classes.inputElement}>
                                     <TextValidator
                                         className="mt-4"
-                                        placeholder="Date"
-                                        helperText="Enter Date"
+                                        placeholder="Amount"
+                                        helperText="Pay Amount"
                                         variant="outlined"
                                         size="small"
                                         fullWidth
-                                        type="date"
-                                        name="date"
-                                        value={this.state.formData.date}
+                                        type="number"
+                                        name="amount"
+                                        disabled
+                                        value={this.state.formData.amount}
+                                        onChange={(e) => this.handleChange(e)} 
+                                        validators={['required', 'minNumber:0']}
+                                        errorMessages={['This field is required', 'Please Enter Valid Amount']}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12} md={12} className={classes.inputElement}>
+                                    <TextValidator
+                                        className="mt-4"
+                                        placeholder="Payment Type"
+                                        helperText="Pay Type"
+                                        variant="outlined"
+                                        size="small"
+                                        fullWidth
+                                        type="text"
+                                        name="type"
+                                        disabled
+                                        value={this.state.formData.type}
                                         onChange={(e) => this.handleChange(e)} 
                                         validators={['required']}
                                         errorMessages={['This field is required']}
@@ -262,7 +372,7 @@ class CreateBookConference extends Component {
                                 <Grid item xs={12} md={12}>
                                     <div className="text-center my-3">
                                         <Button variant="contained" color="primary" type="submit">
-                                            Book
+                                            Confirm Payment
                                         </Button>
                                     </div>
                                 </Grid>
@@ -299,4 +409,4 @@ class CreateBookConference extends Component {
     }
 }
 
-export default withStyles(styles)(CreateBookConference);
+export default withStyles(styles)(CreatePayment);

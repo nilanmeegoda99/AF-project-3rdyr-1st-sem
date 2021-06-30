@@ -10,6 +10,11 @@ const conferenceModel = mongoose.Schema({
         type: String,
         required: true,
     },
+    active: {
+        type: Boolean,
+        default: false,
+        required: false,
+    },
     startDate: {
         type: String,
         required: true,

@@ -6,7 +6,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Alert } from '@material-ui/lab';
-
+import axios from 'axios';
 import Loader from '../../common/Loader';
 
 const styles = theme =>({
@@ -30,6 +30,7 @@ const initialState = {
     message: '',
     loading: false,
     dialogBox: false,
+    id: '',
 
     formData: {
         title: '',
@@ -47,6 +48,7 @@ class EditConferenceDetails extends Component {
         this.fromSubmit = this.fromSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleDialogBoxButton = this.handleDialogBoxButton.bind(this);
+        this.loadData = this.loadData.bind(this);
 
     }
 
@@ -62,15 +64,8 @@ class EditConferenceDetails extends Component {
         var variantRes = null;
         var dialogBoxRes = true;
 
-        // axios.post('http://', data)
-        // .then(res => {
-            var res={
-                status:200,
-                data:{
-                    success: true,
-                    message: "Data Success",
-                }
-            }
+        axios.put('http://localhost:5000/api/conferences/'+this.state.id, this.state.formData)
+        .then(res => {
             if(res.status == 200){
                 if(res.data.success){
                     messageRes = res.data.message;
@@ -85,13 +80,12 @@ class EditConferenceDetails extends Component {
                 messageRes = res.data.message;
                 variantRes = "error";
             }
-        // })
-        // .catch(error => {
-        //     console.log(error);
-        //     messageRes = error.message;
-        //     variantRes = "error";
-        //     dialogBox: dialogBoxRes,
-        // })
+        })
+        .catch(error => {
+            console.log(error);
+            messageRes = error.message;
+            variantRes = "error";
+        })
 
         setTimeout(() => {
             this.setState({
@@ -124,7 +118,51 @@ class EditConferenceDetails extends Component {
         window.location.href = "/admin/conferences";
     }
 
+    async loadData(cId){
+        var conferenceOne;
+        var messageRes = '';
+        var variantRes = '';
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/conferences/'+cId)
+        .then(res => {
+            console.log(res);
+            if(res.status == 200){
+                if(res.data.success){
+                    messageRes = res.data.message;
+                    variantRes = "success";
+                    conferenceOne = res.data.conference;
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
+
+        this.setState({
+            message: messageRes,
+            formData: conferenceOne,
+            variant: variantRes,
+            id: cId,
+        })
+
+    }
+
     componentDidMount(){
+
+        //load data from database
+        var cId = this.props.match.params.id;
+        this.loadData(cId);
 
         if(window.innerWidth < 850){
             this.setState({

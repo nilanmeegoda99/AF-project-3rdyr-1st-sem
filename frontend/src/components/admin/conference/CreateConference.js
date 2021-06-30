@@ -6,7 +6,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Alert } from '@material-ui/lab';
-
+import axios from 'axios';
 import Loader from '../../common/Loader';
 import create_conference from 'url:../../../../public/images/create_conference.jpg';
 
@@ -60,16 +60,10 @@ class CreateConference extends Component {
         var variantRes = null;
         var dialogBoxRes = true;
 
-        // axios.post('http://', data)
-        // .then(res => {
-            var res={
-                status:200,
-                data:{
-                    success: true,
-                    message: "Data Success",
-                }
-            }
-            if(res.status == 200){
+        axios.post('http://localhost:5000/api/conferences', this.state.formData)
+        .then(res => {
+            // console.log(res);
+            if(res.status == 201){
                 if(res.data.success){
                     messageRes = res.data.message;
                     variantRes = "success";
@@ -83,13 +77,13 @@ class CreateConference extends Component {
                 messageRes = res.data.message;
                 variantRes = "error";
             }
-        // })
-        // .catch(error => {
-        //     console.log(error);
-        //     messageRes = error.message;
-        //     variantRes = "error";
-        //     dialogBox: dialogBoxRes,
-        // })
+        })
+        .catch(error => {
+            console.log(error);
+            messageRes = error.message;
+            variantRes = "error";
+            dialogBox = dialogBoxRes;
+        })
 
         setTimeout(() => {
             this.setState({

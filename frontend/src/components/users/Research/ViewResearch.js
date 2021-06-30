@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {
     Grid, Typography, Card, CardContent, Button, Chip, 
-    Switch, FormControlLabel, FormGroup, Alert, CardMedia, Tooltip,
+    Switch, FormControlLabel, FormGroup, Alert, CardMedia, Tooltip,Snackbar,
 }
 from '@material-ui/core';
 import { Link } from 'react-router-dom';
@@ -12,6 +12,8 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 import AuthService from '../../../services/AuthService';
 import fileIcon1 from 'url:../../../../public/images/fileIcon1.png';
+import { Alert } from '@material-ui/lab';
+import axios from 'axios';
 
 const styles = theme =>({
 
@@ -49,6 +51,16 @@ const initialState = {
     showAttachments: false,
     isPaid: false,
     completed: false,
+    
+    snackbar: false,
+    variant: '',
+    message: '',
+    id: '',
+    createdBy: '',
+    conferenceTitle: '',
+    
+    research: {},
+    image: null,
 }
 
 class ViewResearch extends Component {
@@ -91,12 +103,61 @@ class ViewResearch extends Component {
 
     }
 
-    openAttachment(){
-        window.open(fileIcon1, '_blank');
+    openAttachment(attachment){
+        window.open("http://localhost:5000/"+attachment , '_blank');
     }
 
-    componentDidMount(){
+    async componentDidMount(){
 
+        var id = this.props.match.params.id;
+
+        var messageRes = '';
+        var variantRes = '';
+        var snackbarRes = true;
+        var approved_res = false;
+        var researchOne = {};
+        var user = '';
+        var title = '';
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/researches/'+id)
+        .then(res => {
+            console.log(res);
+            
+            if(res.status == 200){
+                if(res.data.success){
+                    snackbarRes = false;
+                    researchOne = res.data.research;
+                    approved_res = researchOne.is_Approved;
+                    title = researchOne.conference.title;
+                    user = researchOne.user.email;
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
+        
+        this.setState({
+            message: messageRes,
+            research: researchOne,
+            variant: variantRes,
+            snackbar: snackbarRes,
+            conferenceTitle: title,
+            createdBy: user,
+            approved: approved_res,
+            id: id,
+        })
     }
 
     render() {
@@ -110,26 +171,31 @@ class ViewResearch extends Component {
                     <Grid item xs={12} md={12}>
                         <Card className={classes.detailsCard}>
                             <CardContent>
-                                <Typography variant="h4" >RESEARCH : Title</Typography>
-                                <Typography variant="h4" >CONFERENCE : Title</Typography>
+                                <Typography variant="h4" >RESEARCH : 
+                                {( this.state.research.title+ "").toUpperCase() }</Typography>
+
+                                <Typography variant="h4" >CONFERENCE :
+                                {( this.state.conferenceTitle+ "").toUpperCase() }</Typography>
+
                                 <hr />
-                                <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Date</b>: 2020/01/01
-                                </Typography>
+                                { this.state.approved && 
+                                    <>
+                                    <Typography variant="body1" className={classes.detailsRow}>
+                                        <b>Date</b>: { this.state.research.date }
+                                    </Typography>
+
+                                    <Typography variant="body1" className={classes.detailsRow}>
+                                        <b>Time</b>:  { this.state.research.time }
+                                    </Typography>
+                                    </>
+                                }
 
                                 <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Time</b>: 11.00 AM
-                                </Typography>
+                                    <b>Description</b>: { this.state.research.description }
+                                    </Typography>
 
                                 <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Description</b>: Contrary to popular belief, Lorem Ipsum is not simply random text. 
-                                    It has roots in a piece of classical Latin literature from 45 BC, making it over 
-                                    2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in 
-                                    Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem 
-                                </Typography>
-
-                                <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Created By</b>: Amal Perera
+                                    <b>Created By</b>: { this.state.createdBy }
                                 </Typography>
 
                                 <Typography variant="body1" className="mt-4">
@@ -156,7 +222,7 @@ class ViewResearch extends Component {
                                             <CardMedia
                                                 component="img"
                                                 image={fileIcon1}
-                                                onClick={ this.openAttachment }
+                                                onClick={ () => this.openAttachment(this.state.research.attachment) }
                                             />
                                         </Card>
                                     </Tooltip>
@@ -186,7 +252,7 @@ class ViewResearch extends Component {
                                 <br /><br />
                                 <b>Paid</b>: &ensp;
                                 {
-                                    this.state.isPaid ? 
+                                    this.state.research.is_Paid ? 
                                     <Chip
                                         icon={<CheckCircleIcon style={{ color: '#018E17' }} />}
                                         label="Yes"
@@ -195,19 +261,21 @@ class ViewResearch extends Component {
                                         variant="outlined"
                                     />
                                     :
-                                    <Chip
-                                        icon={<CancelIcon />}
-                                        label="No"
-                                        clickable={false}
-                                        color="secondary"
-                                        variant="outlined"
-                                    />
+                                    <>
+                                        <Chip
+                                            icon={<CancelIcon />}
+                                            label="No"
+                                            clickable={false}
+                                            color="secondary"
+                                            variant="outlined"
+                                        />
+                                    </>
                                 }
 
                                 <br /><br />
                                 <b>Completed</b>: &ensp;
                                 {
-                                    this.state.completed ? 
+                                    this.state.research.completed ? 
                                     <Chip
                                         icon={<CheckCircleIcon style={{ color: '#018E17' }} />}
                                         label="Yes"
@@ -225,9 +293,28 @@ class ViewResearch extends Component {
                                     />
                                 }
 
-                                <Typography variant="h4">
-                                    Payment Form
-                                </Typography>
+                                { this.state.research.completed == false && 
+                                    this.state.research.is_Paid == false &&
+                                    this.state.approved &&
+                                    <Grid item xs={12} md={12}>
+                                        <div style={{ 
+                                            marginBottom: 20, 
+                                            marginTop: 20, 
+                                            padding:10, 
+                                            position: 'relative', 
+                                            float: 'right' }}>
+                                            
+                                            <Link to={"/researches/pay/"}>
+                                                <button
+                                                    type="button" 
+                                                    className="btn btn-outline-primary"
+                                                >
+                                                    Make Payment
+                                                </button>
+                                            </Link>
+                                        </div>
+                                    </Grid>
+                                }
 
                                 <Grid item xs={12} md={12}>
                                     <div style={{ 
@@ -237,7 +324,7 @@ class ViewResearch extends Component {
                                         position: 'relative', 
                                         float: 'right' }}>
                                         
-                                        <Link to="/researches/edit/1">
+                                        <Link to={"/researches/edit/"+this.state.id}>
                                             <button
                                                 type="button" 
                                                 className="btn btn-outline-primary"
@@ -251,6 +338,12 @@ class ViewResearch extends Component {
                             </CardContent>                            
                         </Card>
                     </Grid>
+                    {
+                     this.state.message != '' &&   
+                        <Snackbar open={this.state.snackbar}  autoHideDuration={2500} onClose={this.closeSnackBar} name="snackBar">
+                            <Alert severity={this.state.variant} onClose={this.closeSnackBar} >{this.state.message}</Alert>
+                        </Snackbar>
+                    }
 
                 </Grid>
             </div>

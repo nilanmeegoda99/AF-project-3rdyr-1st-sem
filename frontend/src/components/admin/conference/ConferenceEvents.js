@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Grid, Typography, Paper, Tooltip,
-    Table, TableBody, TableCell, TableHead, TableRow, TableContainer
+    Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Snackbar,
 } from '@material-ui/core';
 import { withStyles } from "@material-ui/core/styles";
 import Loader from '../../common/Loader';
@@ -10,6 +10,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import AuthService from '../../../services/AuthService';
+import axios from 'axios';
+import { Alert } from '@material-ui/lab';
 
 const styles = theme =>({
 
@@ -56,29 +58,12 @@ const initialState = {
 
     isLargeScreen: true,
     loading: false,
+    snackbar: false,
+    message: '',
+    variant:'',
 
     adminRole: '',
-
-    rows: [
-        {
-            title: "aghkhjbc gk hjkhj",
-            year: "2021/08/05",
-            year: "2021/08/05",
-            venue: "ghkjk ghkhgk ghkk",
-        },
-        {
-            title: "uiouio oiuu oipop",
-            year: "2020/07/07",
-            year: "2020/07/07",
-            venue: "rtyrty rtyty  tyrtyrt",
-        },
-        {
-            title: "abc acs asdsa",
-            year: "2019/06/15",
-            year: "2019/06/15",
-            venue: "asdsa asdsad  sads",
-        },
-    ]
+    events: [],
     
 };
 
@@ -87,17 +72,102 @@ class ConferenceEvents extends Component {
     constructor(props){
         super(props);
         this.state = initialState;
+        this.deleteEvent = this.deleteEvent.bind(this);
     }
+
+    closeSnackBar = (event, response) => {
+        this.setState({
+            snackbar: false,
+        })
+    }
+
+    deleteEvent(id){
+
+        var result = confirm("Are Sure You Want to delete?");
+
+        if(result){
+            var messageRes = '';
+            var variantRes = '';
+            var resSnackbar = true;
     
-    componentDidMount(){
+            axios.delete('http://localhost:5000/api/events/'+id)
+            .then(res => {
+                console.log(res);
+                if(res.status == 200){
+                    if(res.data.success){
+                        resSnackbar = false;
+                        window.location.reload(false);
+                    }
+                    else{
+                        messageRes = res.data.message;
+                        variantRes = "error";
+                    }
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            })
+            .catch(error => {
+                console.log("Error:",error);
+                variantRes = "error";
+                messageRes = error.message;
+            })
+            
+            this.setState({
+                message: messageRes,
+                variant: variantRes,
+                snackbar: resSnackbar,
+            })
+        }
+
+    }
+
+    async componentDidMount(){
 
         var localStorageData = AuthService.getUserData();
         // console.log("User Data",localStorageData);
 
         var role = localStorageData.userData.user_type;
 
+        var eventsArrArr = [];
+        var messageRes = '';
+        var variantRes = '';
+        var snackbarRes = true;
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/events')
+        .then(res => {
+            console.log(res);
+            
+            if(res.status == 200){
+                if(res.data.success){
+                    variantRes = "success";
+                    eventsArrArr = res.data.events;
+                    snackbarRes = false;
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
+
         this.setState({
             adminRole: role,
+            message: messageRes,
+            events: eventsArrArr,
+            variant: variantRes,
+            snackbar: snackbarRes,
         });
     }
 
@@ -145,27 +215,36 @@ class ConferenceEvents extends Component {
                                 </TableHead>
 
                                 <TableBody>
-                                {this.state.rows.map((row) => (
+                                {this.state.events.map((row) => (
                                     <TableRow key={row.title} hover>
                                         <TableCell className={classes.tableCell} >{row.title}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.venue}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.year}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.year}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.conference.title}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.startDate}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.endDate}</TableCell>
                                         <TableCell className={classes.tableCell} >
                                             <Tooltip title="Edit" arrow>
-                                                <Link to="/admin/events/1">
+                                                <Link to={"/admin/events/"+row._id}>
                                                     <EditIcon className={classes.editButtonIcon}></EditIcon>
                                                 </Link>
                                             </Tooltip>
-                                            <Tooltip title="Approved" arrow>
-                                                <CheckIcon className={classes.activeButtonIcon}></CheckIcon>
-                                            </Tooltip>
-                                            <Tooltip title="Not Approved" arrow>
-                                                <CloseIcon className={classes.deActiveButtonIcon}></CloseIcon>
-                                            </Tooltip>
-                                            <Tooltip title="Delete" arrow>
-                                                <DeleteIcon className={classes.deleteButtonIcon}></DeleteIcon>
-                                            </Tooltip>
+                                            {
+                                                row.is_Approved ?
+                                                <Tooltip title="Approved" arrow>
+                                                    <CheckIcon className={classes.activeButtonIcon}></CheckIcon>
+                                                </Tooltip>
+                                                :
+                                                <>
+                                                    <Tooltip title="Not Approved" arrow>
+                                                        <CloseIcon className={classes.deActiveButtonIcon}></CloseIcon>
+                                                    </Tooltip>
+                                                    <Tooltip title="Delete" arrow>
+                                                        <DeleteIcon 
+                                                            className={classes.deleteButtonIcon}
+                                                            onClick={() => this.deleteEvent(row._id)}
+                                                        ></DeleteIcon>
+                                                    </Tooltip>
+                                                </>
+                                            }
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -174,6 +253,12 @@ class ConferenceEvents extends Component {
                         </TableContainer>
 
                     </Grid>
+
+                    { this.state.message != '' &&
+                        <Snackbar open={this.state.snackbar}  autoHideDuration={2500} onClose={this.closeSnackBar} name="snackBar">
+                            <Alert severity={this.state.variant} onClose={this.closeSnackBar} >{this.state.message}</Alert>
+                        </Snackbar>
+                    }
 
                 </Grid>
             </div>

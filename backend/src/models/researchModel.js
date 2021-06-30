@@ -12,23 +12,23 @@ const ResearchModel = mongoose.Schema({
     },
     date: {
         type: String,
-        required: true,
+        required: false,
     },
     time: {
         type: String,
-        required: true,
+        required: false,
     },
     is_Approved:{
         type: Boolean,
-        required: true,
+        required: false,
     },
     is_Paid:{
         type: Boolean,
-        required: true,
+        required: false,
     },
     completed:{
         type: Boolean,
-        required: true,
+        required: false,
     },
     attachment:{
         type: String,
@@ -36,7 +36,7 @@ const ResearchModel = mongoose.Schema({
     },
     payment:{
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
+        required: false,
         ref:'payment'
     },
     conference:{

@@ -8,6 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Alert } from '@material-ui/lab';
 import Loader from '../../common/Loader';
+import axios from 'axios';
 
 const styles = theme =>({
 
@@ -32,21 +33,12 @@ const initialState = {
     dialogBox: false,
     snackbar: false,
     noOfFiles: 0,
+    id: '',
 
     formData: {
         title: '',
         description: '',
-        attachments: [],
-        conference: '',
-        created_by: '',
     },
-    conferences: [
-        {
-            key: 1,
-            value: 'Sample Conference'
-    
-        },
-    ],
     
 };
 class EditWorkshop extends Component {
@@ -58,7 +50,7 @@ class EditWorkshop extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleDialogBoxButton = this.handleDialogBoxButton.bind(this); 
         this.setSelectedValue = this.setSelectedValue.bind(this); 
-
+        this.loadData = this.loadData.bind(this); 
     }
 
     fromSubmit(e){
@@ -73,15 +65,8 @@ class EditWorkshop extends Component {
         var variantRes = null;
         var dialogBoxRes = true;
 
-        // axios.post('http://', data)
-        // .then(res => {
-            var res={
-                status:200,
-                data:{
-                    success: true,
-                    message: "Data Success",
-                }
-            }
+        axios.put('http://localhost:5000/api/workshops/'+this.state.id, this.state.formData)
+        .then(res => {
             if(res.status == 200){
                 if(res.data.success){
                     messageRes = res.data.message;
@@ -96,13 +81,12 @@ class EditWorkshop extends Component {
                 messageRes = res.data.message;
                 variantRes = "error";
             }
-        // })
-        // .catch(error => {
-        //     console.log(error);
-        //     messageRes = error.message;
-        //     variantRes = "error";
-        //     dialogBox: dialogBoxRes,
-        // })
+        })
+        .catch(error => {
+            console.log(error);
+            messageRes = error.message;
+            variantRes = "error";
+        })
 
         setTimeout(() => {
             this.setState({
@@ -149,7 +133,36 @@ class EditWorkshop extends Component {
 
     }
 
+    async loadData(id){
+        
+        var wId = id;
+        var data = {};
+
+        await axios.get('http://localhost:5000/api/workshops/'+wId)
+        .then(res => {
+            console.log(res);
+            if(res.status == 200){
+                if(res.data.success){
+                    data = res.data.workshop;
+                }
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+        })
+
+        this.setState({
+            id: wId,
+            formData: data,
+        })
+
+    }
+
     componentDidMount(){
+
+        //load data from db
+        var id = this.props.match.params.id;
+        this.loadData(id);
 
         if(window.innerWidth < 960){
             this.setState({
@@ -232,28 +245,8 @@ class EditWorkshop extends Component {
                                     />
                                 </Grid>
 
-                                <Grid item xs={12} md={12} className={classes.inputElement}>
-                                    <Autocomplete
-                                        className="mt-4 mb-3"
-                                        fullWidth
-                                        options={this.state.conferences}
-                                        getOptionLabel={(opt) => opt.value}
-                                        name="conference"
-                                        size='small'
-                                        // value={{value: this.state.formData.conference}}
-                                        onChange={(e,v) => this.setSelectedValue("conference", v == null ? null : v.value) }
-                                        renderInput={(params) =><TextValidator {...params} variant="outlined"
-                                            placeholder="Select Conference"
-                                            helperText="Select Conference"
-                                            value={this.state.formData.conference == '' ? '' : this.state.formData.conference}
-                                            validators={["required"]}
-                                            errorMessages={["User Type is required!"]}
-                                        /> }
-                                    />
-                                </Grid>
-
                                 <Grid item xs={12} md className={classes.inputElement}>
-                                    <Alert severity="info">You Can't Update Attachments.</Alert>
+                                    <Alert severity="info">You Can't Update Attachments and Conference.</Alert>
                                 </Grid>
 
                                 <Grid item xs={12} md={12}>

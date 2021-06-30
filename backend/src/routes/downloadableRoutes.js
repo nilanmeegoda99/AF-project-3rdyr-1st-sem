@@ -8,5 +8,6 @@ router.route('/').post(downloadableController.createMaterial)
                  .get(downloadableController.getAllMaterials)
 
 router.route('/:id').delete(downloadableController.deleteMaterial)
+router.route('/:id').get(downloadableController.getMaterialById)
 
 export default router;

@@ -9,8 +9,6 @@ const createWorkshop = async(req, res) => {
     if(req.body){
         const workshopDetails = {
             title: req.body.title,
-            date: req.body.date,
-            time: req.body.time,
             description: req.body.description,
             conference: req.body.conference,
             attachment: req.body.attachment,
@@ -35,11 +33,11 @@ const createWorkshop = async(req, res) => {
 
 // @desc  Get All Workshops
 // @route GET /api/workshops
-// @access Public Workshop Coordinator
+// @access Admin Reviewer
 
 const getAllWorkshops = async(req, res) => {
 
-    await Workshop.find({})
+    await Workshop.find({}).populate("conference")
     .then( data => {
         res.status(200).send({ success: true, 'workshops': data })
     })
@@ -56,9 +54,9 @@ const getWorkshopByID = async(req, res) => {
 
     if(req.params && req.params.id){
         
-        await Workshop.findById(req.params.id)
+        await Workshop.findById(req.params.id).populate("conference").populate("user")
         .then( data => {
-            res.status(200).send({ success: true, 'workshops': data })
+            res.status(200).send({ success: true, 'workshop': data })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -81,15 +79,13 @@ const updateWorkshopDetails = async(req, res) => {
         const query = { "_id": req.params.id };
         const update = { 
             title: req.body.title,
-            date: req.body.date,
-            time: req.body.time,
             description: req.body.description,
          };
         
         await Workshop.updateOne( query , update)
         .then( result => {
             // console.log(result.modifiedCount);
-            res.status(201).send({ success: true, 'message': "Workshop Updated Successfully!" })
+            res.status(200).send({ success: true, 'message': "Workshop Updated Successfully!" })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -110,7 +106,7 @@ const deleteWorkshopDetails = async(req, res) => {
         
         await Workshop.deleteOne( {"_id":req.params.id} )
         .then( result => {
-            res.status(201).send({ success: true, 'message': "Workshop Deleted Successfully!" })
+            res.status(200).send({ success: true, 'message': "Workshop Deleted Successfully!" })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -131,12 +127,14 @@ const approveWorkshop = async(req, res) => {
         const query = { "_id": req.params.id };
         const update = { 
             "is_Approved": req.body.is_Approved,
+            "date": req.body.date,
+            "time": req.body.time,
          };
         
         await Workshop.updateOne( query , update)
         .then( result => {
             // console.log(result.modifiedCount);
-            res.status(201).send({ success: true, 'message': "Workshop Approved Status Updated Successfully!" })
+            res.status(200).send({ success: true, 'message': "Workshop Approved Status Updated Successfully!" })
         })
         .catch( (error) => {
             res.status(500).send({ success: false, 'message': error })
@@ -147,6 +145,27 @@ const approveWorkshop = async(req, res) => {
     }
 }
 
+
+// @desc  Get All Workshops by user
+// @route GET /api/workshops/user/:id
+// @access Public Workshop Coordinator
+
+const getAllWorkshopsByUser = async(req, res) => {
+
+    if(req.params && req.params.id){
+        await Workshop.find({ "user": req.params.id}).populate('conference')
+        .then( data => {
+            res.status(200).send({ success: true, 'workshops': data })
+        })
+        .catch( (error) => {
+            res.status(500).send({ success: false, 'message': error })
+        } )
+    }
+    else{
+        res.status(500).send({ success: false, 'message': error })
+    }
+}
+
 export default{
     createWorkshop,
     getAllWorkshops,
@@ -154,4 +173,5 @@ export default{
     updateWorkshopDetails,
     deleteWorkshopDetails,
     approveWorkshop,
+    getAllWorkshopsByUser,
 }

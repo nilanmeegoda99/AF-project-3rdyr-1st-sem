@@ -36,6 +36,7 @@ import axios from 'axios';
                         data:{
                             name:'kamal',
                             email:'kamal@gmail.com',
+                            id: "60d90867e53d7b1b0c2eb933",
                             isAdmin: 
                                 // true,
                                 false,

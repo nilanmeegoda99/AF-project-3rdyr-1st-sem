@@ -7,6 +7,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Alert } from '@material-ui/lab';
+import axios from 'axios';
 
 import Loader from '../../common/Loader';
 import createEvent from 'url:../../../../public/images/createEvent.jpg';
@@ -42,13 +43,7 @@ const initialState = {
         otherDetails: '',
         conference: '',
     },
-    conferences: [
-        {
-            key: 1,
-            value: 'Sample Conference'
-    
-        },
-    ],
+    conferences: [],
     
 };
 class CreateEvent extends Component {
@@ -60,6 +55,7 @@ class CreateEvent extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleDialogBoxButton = this.handleDialogBoxButton.bind(this); 
         this.setSelectedValue = this.setSelectedValue.bind(this); 
+        this.loadData = this.loadData.bind(this); 
 
     }
 
@@ -75,16 +71,10 @@ class CreateEvent extends Component {
         var variantRes = null;
         var dialogBoxRes = true;
 
-        // axios.post('http://', data)
-        // .then(res => {
-            var res={
-                status:200,
-                data:{
-                    success: true,
-                    message: "Data Success",
-                }
-            }
-            if(res.status == 200){
+        axios.post('http://localhost:5000/api/events', this.state.formData)
+        .then(res => {
+            
+            if(res.status == 201){
                 if(res.data.success){
                     messageRes = res.data.message;
                     variantRes = "success";
@@ -98,13 +88,12 @@ class CreateEvent extends Component {
                 messageRes = res.data.message;
                 variantRes = "error";
             }
-        // })
-        // .catch(error => {
-        //     console.log(error);
-        //     messageRes = error.message;
-        //     variantRes = "error";
-        //     dialogBox: dialogBoxRes,
-        // })
+        })
+        .catch(error => {
+            console.log(error);
+            messageRes = error.message;
+            variantRes = "error";
+        })
 
         setTimeout(() => {
             this.setState({
@@ -150,7 +139,36 @@ class CreateEvent extends Component {
 
     }
 
+    async loadData(){
+
+        var conferenceOne;
+        var conferenceArr = [];
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/conferences/active')
+        .then(res => {
+            console.log(res);
+            if(res.status == 200){
+                if(res.data.success){
+                    conferenceOne = res.data.conference;
+                    conferenceArr.push(conferenceOne);
+                }
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+        })
+
+        this.setState({
+            conferences: conferenceArr,
+        })
+
+    }
+
     componentDidMount(){
+
+        //load conferences
+        this.loadData()
 
         if(window.innerWidth < 960){
             this.setState({
@@ -299,11 +317,10 @@ class CreateEvent extends Component {
                                             className="mt-4"
                                             fullWidth
                                             options={this.state.conferences}
-                                            getOptionLabel={(opt) => opt.value}
+                                            getOptionLabel={(opt) => opt.title}
                                             name="conference"
                                             size='small'
-                                            // value={{value: this.state.formData.conference}}
-                                            onChange={(e,v) => this.setSelectedValue("conference", v == null ? null : v.value) }
+                                            onChange={(e,v) => this.setSelectedValue("conference", v == null ? null : v._id) }
                                             renderInput={(params) =><TextValidator {...params} variant="outlined"
                                                 placeholder="Select Conference"
                                                 helperText="Select Conference"

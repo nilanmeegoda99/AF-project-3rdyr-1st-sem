@@ -8,7 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Alert } from '@material-ui/lab';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-
+import axios from 'axios';
 import Loader from '../../common/Loader';
 
 const styles = theme =>({
@@ -38,16 +38,11 @@ const initialState = {
     formData: {
         type: '',
         description: '',
-        attachments: [],
+        attachment: '',
         conference: '',
     },
-    conferences: [
-        {
-            key: 1,
-            value: 'Sample Conference'
-    
-        },
-    ],
+    conferences: [],
+    attachments: [],
     types:[
         {
             key: 1,
@@ -70,6 +65,45 @@ class CreateTemplate extends Component {
         this.handleDialogBoxButton = this.handleDialogBoxButton.bind(this); 
         this.setSelectedValue = this.setSelectedValue.bind(this); 
         this.handleFileUpload = this.handleFileUpload.bind(this); 
+        this.loadData = this.loadData.bind(this); 
+        this.uploadData = this.uploadData.bind(this); 
+    }
+
+    uploadData(){
+        console.log(this.state);
+        var messageRes = null;
+        var variantRes = null;
+        var dialogBoxRes = false;
+        var snackBarres = true;
+
+        axios.post('http://localhost:5000/api/materials', this.state.formData)
+        .then(res => {
+            if(res.status == 201){
+                messageRes = res.data.message;
+                variantRes = "success";
+                dialogBoxRes = true;
+                snackBarres = false;
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            messageRes = error.message;
+            variantRes = "error";
+        })
+
+        setTimeout(() => {
+            this.setState({
+                message: messageRes,
+                variant: variantRes,
+                loading: false,
+                snackbar: snackBarres,
+                dialogBox: dialogBoxRes,
+            })
+        }, 2000);
 
     }
 
@@ -80,50 +114,54 @@ class CreateTemplate extends Component {
             loading: true,
         })
 
-        console.log(this.state);
+        // console.log(this.state);
         var messageRes = null;
         var variantRes = null;
-        var dialogBoxRes = true;
+        var fileUrl = '';
+        var snackbarRes = true;
+        var form_data = this.state.formData;
 
-        // axios.post('http://', data)
-        // .then(res => {
-            var res={
-                status:200,
-                data:{
-                    success: true,
-                    message: "Data Success",
-                }
-            }
+        var data = new FormData();
+        data.append("attachment",this.state.attachments[0]);
+
+        axios.post('http://localhost:5000/api/files/uploadFile', data)
+        .then(res => {
             if(res.status == 200){
-                if(res.data.success){
-                    messageRes = res.data.message;
-                    variantRes = "success";
-                }
-                else{
-                    messageRes = res.data.message;
-                    variantRes = "error";
-                }
+                console.log(res);
+                fileUrl = res.data.path.replace(/\\/g, "/");
+                // console.log("FIle:",fileUrl);
+                
+                messageRes = "File Upload Success";
+                variantRes = "success";
+                snackbarRes = false;
+                form_data['attachment'] = fileUrl;
+
+                this.setState({
+                    formData: form_data,
+                })
+
+                this.uploadData();
+
             }
             else{
                 messageRes = res.data.message;
                 variantRes = "error";
             }
-        // })
-        // .catch(error => {
-        //     console.log(error);
-        //     messageRes = error.message;
-        //     variantRes = "error";
-        //     dialogBox: dialogBoxRes,
-        // })
+        })
+        .catch(error => {
+            console.log(error);
+            messageRes = error.message;
+            variantRes = "error";
+        })
 
-        setTimeout(() => {
+        setTimeout( () => {
             this.setState({
                 message: messageRes,
                 variant: variantRes,
                 loading: false,
-                dialogBox: dialogBoxRes,
+                snackbar: snackbarRes,
             })
-        }, 2000);
+        }, 2000)
 
     }
 
@@ -165,7 +203,6 @@ class CreateTemplate extends Component {
         event.persist();
         
         var files = [];
-        var data = this.state.formData;
 
         if (event.target.files[0] !== undefined) {
 
@@ -198,11 +235,10 @@ class CreateTemplate extends Component {
         }
 
         var no = 0;
-        data['attachments'] = files;
         no = files.length;
 
         this.setState({
-            formData: data,
+            attachments: files,
             noOfFiles: no,
         })
 
@@ -215,7 +251,36 @@ class CreateTemplate extends Component {
         })
     }
 
+    async loadData(){
+        var conferenceOne;
+        var conferenceArr = [];
+        var data = this.state.formData;
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/conferences/active')
+        .then(res => {
+            // console.log(res);
+            if(res.status == 200){
+                if(res.data.success){
+                    conferenceOne = res.data.conference;
+                    conferenceArr.push(conferenceOne);
+                }
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+        })
+
+        this.setState({
+            conferences: conferenceArr,
+        })
+        // console.log(this.state)
+    }
+
     componentDidMount(){
+
+        //load data from db
+        this.loadData();
 
         if(window.innerWidth < 960){
             this.setState({
@@ -306,11 +371,11 @@ class CreateTemplate extends Component {
                                         className="mt-4 mb-3"
                                         fullWidth
                                         options={this.state.conferences}
-                                        getOptionLabel={(opt) => opt.value}
+                                        getOptionLabel={(opt) => opt.title}
                                         name="conference"
                                         size='small'
                                         // value={{value: this.state.formData.conference}}
-                                        onChange={(e,v) => this.setSelectedValue("conference", v == null ? null : v.value) }
+                                        onChange={(e,v) => this.setSelectedValue("conference", v == null ? null : v._id) }
                                         renderInput={(params) =><TextValidator {...params} variant="outlined"
                                             placeholder="Select Conference"
                                             helperText="Select Conference"

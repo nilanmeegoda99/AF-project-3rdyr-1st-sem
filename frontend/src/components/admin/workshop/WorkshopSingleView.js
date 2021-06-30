@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {
     Grid, Typography, Card, CardContent, Button, Chip, 
-    Switch, FormControlLabel, FormGroup, Alert, CardMedia, Tooltip,
+    Switch, FormControlLabel, FormGroup, Alert, CardMedia, Tooltip, Snackbar,
 }
 from '@material-ui/core';
 import { Link } from 'react-router-dom';
@@ -12,6 +12,8 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 import AuthService from '../../../services/AuthService';
 import fileIcon1 from 'url:../../../../public/images/fileIcon1.png';
+import { Alert } from '@material-ui/lab';
+import axios from 'axios';
 
 const styles = theme =>({
 
@@ -50,6 +52,16 @@ const initialState = {
     showForm: false,
     showAttachments: false,
 
+    snackbar: false,
+    variant: '',
+    message: '',
+    id: '',
+    createdBy: {},
+    conferenceTitle: '',
+    
+    workshop: {},
+    image: null,
+
     formData: {
         time: '',
         date: '',
@@ -65,7 +77,10 @@ class WorkshopSingleView extends Component {
         this.showContent = this.showContent.bind(this);
         this.openAttachment = this.openAttachment.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.formSubmit = this.formSubmit.bind(this);
+        this.formSubmitReject = this.formSubmitReject.bind(this);
+        this.formSubmitApprove = this.formSubmitApprove.bind(this);
+        this.closeSnackBar = this.closeSnackBar.bind(this);
+        this.updateWorkshopDetails = this.updateWorkshopDetails.bind(this);
     }
 
     showContent = (name) => {
@@ -99,11 +114,177 @@ class WorkshopSingleView extends Component {
 
     }
 
-    formSubmit(e){
+    
+    closeSnackBar = (event, response) => {
+        this.setState({
+            snackbar: false,
+        })
+    }
+
+    async updateWorkshopDetails(){
+
+        var data = this.state.formData;
+        var submitData = {
+            date: data.date,
+            time: data.time,
+            is_Approved: true,
+        };
+        
+        console.log("a",submitData);
+
+        var messageRes = '';
+        var variantRes = '';
+        var snackbarRes = true;
+
+        await axios.put('http://localhost:5000/api/workshops/approve/'+this.state.id,submitData)
+        .then(res => {
+            // console.log(res);
+            
+            if(res.status == 200){
+                if(res.data.success){
+                    snackbarRes = false;
+                    window.location.reload(false);
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
+        
+        this.setState({
+            snackbar: snackbarRes,
+            message: messageRes,
+            variant: variantRes,
+        })
 
     }
 
-    
+    async formSubmitApprove(e){
+        e.preventDefault();
+        
+        var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+        var data = this.state.formData;
+        var submitData = {
+            title: 'Workshop Submission Approved - '+ this.state.workshop.title,
+            message: data.notificationMessage,
+            date: date,
+            time: time,
+            user: this.state.createdBy._id,
+        };
+        
+        // console.log(submitData);
+
+        var messageRes = '';
+        var variantRes = '';
+        var snackbarRes = true;
+
+        await axios.post('http://localhost:5000/api/notifications',submitData)
+        .then(res => {
+            // console.log(res);
+            
+            if(res.status == 201){
+                if(res.data.success){
+                    messageRes = res.data.message;
+                    variantRes = "success";
+                    snackbarRes = false;
+                    this.updateWorkshopDetails(submitData);
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
+        
+        this.setState({
+            snackbar: snackbarRes,
+            message: messageRes,
+            variant: variantRes,
+        })
+
+    }
+
+    async formSubmitReject(e){
+        e.preventDefault();
+        
+        var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+        var data = this.state.formData;
+        var submitData = {
+            title: 'Workshop Submission Rejected - '+ this.state.workshop.title,
+            message: data.notificationMessage,
+            date: date,
+            time: time,
+            user: this.state.createdBy._id,
+        };
+        
+        console.log(submitData);
+
+        var messageRes = '';
+        var variantRes = '';
+        var snackbarRes = true;
+
+        await axios.post('http://localhost:5000/api/notifications',submitData)
+        .then(res => {
+            console.log(res);
+            
+            if(res.status == 201){
+                if(res.data.success){
+                    messageRes = res.data.message;
+                    variantRes = "success";
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
+        
+        this.setState({
+            snackbar: snackbarRes,
+            message: messageRes,
+            variant: variantRes,
+        })
+
+    }
+
+    openAttachment(attachment){
+        window.open("http://localhost:5000/"+attachment , '_blank');
+    }
+
     handleChange = (e) => {
         var name = e.target.name;
         var value = e.target.value;
@@ -117,20 +298,64 @@ class WorkshopSingleView extends Component {
         // console.log(this.state);
     }
 
-    openAttachment(){
-        window.open(fileIcon1, '_blank');
-    }
-
-    componentDidMount(){
+    async componentDidMount(){
 
         var localStorageData = AuthService.getUserData();
         // console.log("User Data",localStorageData);
 
         var role = localStorageData.userData.user_type;
 
+        var id = this.props.match.params.id;
+
+        var messageRes = '';
+        var variantRes = '';
+        var snackbarRes = true;
+        var approved_res = false;
+        var workshopOne = {};
+        var user = '';
+        var title = '';
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/workshops/'+id)
+        .then(res => {
+            console.log(res);
+            
+            if(res.status == 200){
+                if(res.data.success){
+                    snackbarRes = false;
+                    workshopOne = res.data.workshop;
+                    approved_res = workshopOne.is_Approved;
+                    title = workshopOne.conference.title;
+                    user = workshopOne.user;
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
+        
         this.setState({
             adminRole: role,
-        });
+            message: messageRes,
+            workshop: workshopOne,
+            variant: variantRes,
+            snackbar: snackbarRes,
+            conferenceTitle: title,
+            createdBy: user,
+            approved: approved_res,
+            id: id,
+        })
+
     }
 
     render() {
@@ -144,26 +369,35 @@ class WorkshopSingleView extends Component {
                     <Grid item xs={12} md={12}>
                         <Card className={classes.detailsCard}>
                             <CardContent>
-                                <Typography variant="h4" >WORKSHOP : Title</Typography>
-                                <Typography variant="h4" >CONFERENCE : Title</Typography>
+                                <Typography variant="h4" >WORKSHOP :
+                                {( this.state.workshop.title+ "").toUpperCase() }</Typography>
+
+                                <Typography variant="h4" >CONFERENCE :
+                                {( this.state.conferenceTitle+ "").toUpperCase() }</Typography>
+
                                 <hr />
+                                {
+                                    this.state.approved &&
+                                    <>
+                                        <Typography variant="body1" className={classes.detailsRow}>
+                                            <b>Scheduled Date</b>: { this.state.workshop.date}
+                                        </Typography>
+
+                                        <Typography variant="body1" className={classes.detailsRow}>
+                                            <b>Scheduled Time</b>: { this.state.workshop.time }
+                                        </Typography>
+                                    </>
+                                }
+
                                 <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Date</b>: 2020/01/01
+                                    <b>Description</b>: { this.state.workshop.description }
                                 </Typography>
 
                                 <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Time</b>: 11.00 AM
-                                </Typography>
-
-                                <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Description</b>: Contrary to popular belief, Lorem Ipsum is not simply random text. 
-                                    It has roots in a piece of classical Latin literature from 45 BC, making it over 
-                                    2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in 
-                                    Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem 
-                                </Typography>
-
-                                <Typography variant="body1" className={classes.detailsRow}>
-                                    <b>Created By</b>: Amal Perera
+                                    <b>Created By</b>: <br />
+                                        Name: { this.state.createdBy.name } <br />
+                                        Email: { this.state.createdBy.email } <br />
+                                        Contact Number: { this.state.createdBy.contact_no } <br />
                                 </Typography>
 
                                 <Typography variant="body1" className="mt-4">
@@ -190,7 +424,7 @@ class WorkshopSingleView extends Component {
                                             <CardMedia
                                                 component="img"
                                                 image={fileIcon1}
-                                                onClick={ this.openAttachment }
+                                                onClick={ () => this.openAttachment(this.state.workshop.attachment) }
                                             />
                                         </Card>
                                     </Tooltip>
@@ -219,7 +453,7 @@ class WorkshopSingleView extends Component {
                                 {/* </Typography> */}
 
                                 { 
-                                    this.state.adminRole == 'Reviewer' &&
+                                    this.state.adminRole == 'Reviewer' && this.state.approved == false &&
                                     <>
                                         <Typography variant="body1" className="mt-4">
                                             <b>Change Status</b>
@@ -234,7 +468,7 @@ class WorkshopSingleView extends Component {
                                                         label="Primary"
                                                     />
                                                 }
-                                                label={ this.state.showForm ? "Show Form" : "Hide Form" }
+                                                label={ this.state.showForm ? "Show Approve Form" : "Show Reject Form" }
                                             />
                                         </FormGroup>
                                     </>
@@ -244,9 +478,9 @@ class WorkshopSingleView extends Component {
                         </Card>
                     </Grid>
 
-                { this.state.showForm && this.state.approved == false &&
+                { this.state.showForm == false && this.state.approved == false && this.state.adminRole == 'Reviewer' &&
                     <Grid item xs={12} md={12} className={classes.formGrid} >
-                        <ValidatorForm onSubmit={this.formSubmit}>
+                        <ValidatorForm onSubmit={this.formSubmitApprove}>
                             <Grid container>
                                 <Grid item xs={12} md={12}>
                                     <Typography variant="h4">
@@ -279,7 +513,7 @@ class WorkshopSingleView extends Component {
                                         variant="outlined"
                                         size="small"
                                         fullWidth
-                                        type="text"
+                                        type="time"
                                         name="time"
                                         value={this.state.formData.time}
                                         onChange={(e) => this.handleChange(e)} 
@@ -317,10 +551,10 @@ class WorkshopSingleView extends Component {
                     </Grid>
                 }
 
-                { this.state.approved && this.state.showForm &&
+                { this.state.approved == false && this.state.showForm && this.state.adminRole == 'Reviewer' &&
 
                     <Grid item xs={12} md={12} className={classes.formGrid}>
-                        <ValidatorForm onSubmit={this.formSubmit}>
+                        <ValidatorForm onSubmit={this.formSubmitReject}>
                             <Grid container>
                                 <Grid item xs={12} md={12}>
                                     <Typography variant="h4">
@@ -357,6 +591,13 @@ class WorkshopSingleView extends Component {
                         </ValidatorForm>
                     </Grid>
                 }
+
+                    {       
+                     this.state.message != '' &&   
+                        <Snackbar open={this.state.snackbar}  autoHideDuration={2500} onClose={this.closeSnackBar} name="snackBar">
+                            <Alert severity={this.state.variant} onClose={this.closeSnackBar} >{this.state.message}</Alert>
+                        </Snackbar>
+                    }
 
                 </Grid>
             </div>

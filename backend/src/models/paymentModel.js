@@ -6,6 +6,10 @@ const PaymentModel = mongoose.Schema({
         type: String,
         required: true,
     },
+    type: {
+        type: String,
+        required: true,
+    },
     date: {
         type: String,
         required: true,
@@ -22,6 +26,16 @@ const PaymentModel = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref:'users'
+    },
+    research:{
+        type: mongoose.Schema.Types.ObjectId,
+        required: false,
+        ref:'research'
+    },
+    booking:{
+        type: mongoose.Schema.Types.ObjectId,
+        required: false,
+        ref:'booking'
     },
         
 });

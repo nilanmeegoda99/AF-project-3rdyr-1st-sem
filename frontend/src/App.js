@@ -44,6 +44,10 @@ import ViewBooked from "./components/users/Attendee/ViewBooked";
 
 import ViewProfile from "./components/users/profile/ViewProfile";
 
+//payment
+import ViewPayment from "./components/users/Payment/ViewPayment";
+import CreatePayment from "./components/users/Payment/CreatePayment";
+
 // Admin components
 import Dashboard from "./components/admin/Dashboard";
 import AdminProfile from "./components/admin/AdminProfile";
@@ -145,6 +149,9 @@ class App extends Component{
                         {/* Logged in user Routes */}
                         <UserCommonRoutes exact path="/user/profile" component={ViewProfile} />
 
+                        {/* <UserCommonRoutes exact path="/user/payment/create" component={CreatePayment} /> */}
+                        <UserCommonRoutes exact path="/user/payment/:id" component={ViewPayment} />
+
                         {/* Researcher */}
                         <ResearcherRoutes exact path="/researches/" component={MyResearch} />
                         <ResearcherRoutes exact path="/researches/create" component={CreateResearch} />
@@ -159,8 +166,8 @@ class App extends Component{
 
                         {/* Attendee */}
                         <AttendeeRoutes exact path="/attendee/my" component={BookedConferences} />
-                        <AttendeeRoutes exact path="/attendee/conference/create" component={CreateBookConference} />
-                        <AttendeeRoutes exact path="/attendee/conference/:id" component={ViewBooked} />
+                        <AttendeeRoutes exact path="/attendee/booking/create" component={CreateBookConference} />
+                        <AttendeeRoutes exact path="/attendee/booking/:id" component={ViewBooked} />
 
                         {/* Admin Routes */}
                         {/* Common */}
@@ -178,7 +185,7 @@ class App extends Component{
                         {/* Editor */}
                         <EditorRoutes exact path="/admin/events" component={ConferenceEvents} />
                         <EditorRoutes exact path="/admin/events/create" component={CreateEvent} />
-                        <EditorRoutes exact path="/admin/events/:id" component={EventSingleView} />
+                        <AdminCommonRoutes exact path="/admin/events/:id" component={EventSingleView} />
                         <EditorRoutes exact path="/admin/events/edit/:id" component={EditEvent} />
 
                         {/* Reviewer */}

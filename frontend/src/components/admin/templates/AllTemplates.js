@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Grid, Typography, Paper, Tooltip,
-    Table, TableBody, TableCell, TableHead, TableRow, TableContainer
+    Table, TableBody, TableCell, TableHead, TableRow, TableContainer, Snackbar,
 } from '@material-ui/core';
 import { withStyles } from "@material-ui/core/styles";
 import Loader from '../../common/Loader';
@@ -10,14 +10,18 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import AuthService from '../../../services/AuthService';
+import axios from 'axios';
+import { Alert } from '@material-ui/lab';
 
 const styles = theme =>({
 
     root:{
         marginBottom: 20,
+        marginLeft: 20,
+        marginRight: 20,
     },
     table: {
-        // minWidth: 650,
+        maxWidth: 1000,
     },
     editButtonIcon: {
         color:"#0625C8",
@@ -58,22 +62,12 @@ const initialState = {
     loading: false,
 
     adminRole: '',
+    
+    snackbar: false,
+    variant: '',
+    message: '',
 
-    rows: [
-        {
-            title: "aghkhjbc gk hjkhj",
-            year: "2021/08/05",
-            year: "2021/08/05",
-            venue: "ghkjk ghkhgk ghkk",
-        },
-        {
-            title: "uiouio oiuu oipop",
-            year: "2020/07/07",
-            year: "2020/07/07",
-            venue: "rtyrty rtyty tyrtyrt",
-        },
-
-    ]
+    templates: [],
     
 };
 
@@ -82,18 +76,96 @@ class AllTemplates extends Component {
     constructor(props){
         super(props);
         this.state = initialState;
+        this.deleteTemplate = this.deleteTemplate.bind(this);
+    }
+
+    deleteTemplate(id){
+        var result = confirm("Are Sure You Want to delete?");
+
+        if(result){
+            var messageRes = '';
+            var variantRes = '';
+            var snackbarRes = true;
+    
+            axios.delete('http://localhost:5000/api/materials/'+id)
+            .then(res => {
+                console.log(res);
+                if(res.status == 200){
+                    if(res.data.success){
+                        snackbarRes = false;
+                        window.location.reload(false);
+                    }
+                    else{
+                        messageRes = res.data.message;
+                        variantRes = "error";
+                    }
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            })
+            .catch(error => {
+                console.log("Error:",error);
+                variantRes = "error";
+                messageRes = error;
+            })
+            
+            this.setState({
+                message: messageRes,
+                variant: variantRes,
+                snackbar: snackbarRes,
+            })
+        }
+
     }
     
-    componentDidMount(){
+    async componentDidMount(){
 
         var localStorageData = AuthService.getUserData();
         // console.log("User Data",localStorageData);
 
         var role = localStorageData.userData.user_type;
 
+        var messageRes = '';
+        var variantRes = '';
+        var snackbarRes = true;
+        var templatesArr = [];
+
+        //get data from db
+        await axios.get('http://localhost:5000/api/materials')
+        .then(res => {
+            console.log(res);
+            
+            if(res.status == 200){
+                if(res.data.success){
+                    snackbarRes = false;
+                    templatesArr = res.data.materials;
+                }
+                else{
+                    messageRes = res.data.message;
+                    variantRes = "error";
+                }
+            }
+            else{
+                messageRes = res.data.message;
+                variantRes = "error";
+            }
+        })
+        .catch(error => {
+            console.log("Error:",error)
+            variantRes = "error";
+            messageRes = error.message;
+        })
+
         this.setState({
             adminRole: role,
-        });
+            message: messageRes,
+            templates: templatesArr,
+            variant: variantRes,
+            snackbar: snackbarRes,
+        })
+
     }
 
     render() {
@@ -139,14 +211,14 @@ class AllTemplates extends Component {
                                 </TableHead>
 
                                 <TableBody>
-                                {this.state.rows.map((row) => (
-                                    <TableRow key={row.title} hover>
-                                        <TableCell className={classes.tableCell} >{row.title}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.year}</TableCell>
-                                        <TableCell className={classes.tableCell} >{row.venue}</TableCell>
+                                {this.state.templates.map((row) => (
+                                    <TableRow key={row._id} hover>
+                                        <TableCell className={classes.tableCell} >{row.conference.title}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.type}</TableCell>
+                                        <TableCell className={classes.tableCell} >{row.description}</TableCell>
                                         <TableCell className={classes.tableCell} >
                                             <Tooltip title="Edit" arrow>
-                                                <Link to="/admin/templates/1">
+                                                <Link to={"/admin/templates/"+row._id}>
                                                     <EditIcon className={classes.editButtonIcon}></EditIcon>
                                                 </Link>
                                             </Tooltip>
@@ -157,7 +229,9 @@ class AllTemplates extends Component {
                                                 <CloseIcon className={classes.deActiveButtonIcon}></CloseIcon>
                                             </Tooltip> */}
                                             <Tooltip title="Delete" arrow>
-                                                <DeleteIcon className={classes.deleteButtonIcon}></DeleteIcon>
+                                                <DeleteIcon className={classes.deleteButtonIcon}
+                                                    onClick={() => this.deleteTemplate(row._id)}    
+                                                ></DeleteIcon>
                                             </Tooltip>
                                         </TableCell>
                                     </TableRow>
@@ -167,6 +241,13 @@ class AllTemplates extends Component {
                         </TableContainer>
 
                     </Grid>
+
+                    {
+                     this.state.message != '' &&   
+                        <Snackbar open={this.state.snackbar}  autoHideDuration={2500} onClose={this.closeSnackBar} name="snackBar">
+                            <Alert severity={this.state.variant} onClose={this.closeSnackBar} >{this.state.message}</Alert>
+                        </Snackbar>
+                    }
 
                 </Grid>
             </div>

@@ -12,5 +12,6 @@ router.route('/:id').get(workshopController.getWorkshopByID)
                     .delete(workshopController.deleteWorkshopDetails)
 
 router.route('/approve/:id').put(workshopController.approveWorkshop)
+router.route('/user/:id').get(workshopController.getAllWorkshopsByUser)
 
 export default router;
