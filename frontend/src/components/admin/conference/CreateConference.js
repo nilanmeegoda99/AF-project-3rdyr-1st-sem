@@ -10,7 +10,6 @@ import axios from 'axios';
 import Loader from '../../common/Loader';
 import create_conference from 'url:../../../../public/images/create_conference.jpg';
 
-
 const styles = theme =>({
 
     inputElement:{
@@ -90,7 +89,7 @@ class CreateConference extends Component {
                 message: messageRes,
                 variant: variantRes,
                 loading: false,
-                dialogBox: dialogBoxRes,
+                // dialogBox: dialogBoxRes,
             })
         }, 2000);
 
